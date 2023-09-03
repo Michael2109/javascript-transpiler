@@ -1,1 +1,0 @@
-{"version":3,"file":"token.js","sourceRoot":"","sources":["../../../src/compiler/tokeniser/token.ts"],"names":[],"mappings":";;;AAEA,MAAM,KAAK;IAIP,YAAY,SAAoB,EAAE,IAAY;QAC1C,IAAI,CAAC,SAAS,GAAG,SAAS,CAAA;QAC1B,IAAI,CAAC,IAAI,GAAG,IAAI,CAAA;IACpB,CAAC;CACJ;AAEO,sBAAK"}
