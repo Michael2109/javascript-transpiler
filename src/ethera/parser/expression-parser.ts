@@ -1,27 +1,12 @@
-import {
-    capture,
-    charIn,
-    charsWhileIn,
-    cut,
-    digit,
-    either,
-    eitherMany,
-    LazyParser,
-    Parser,
-    rep,
-    seq,
-    spaces,
-    str
-} from "./parser";
+import {capture, cut, eitherMany, P, rep, seq, spaces, str} from "./parser";
 import {Ast} from "../compiler/ast/ast"
-import Modifier = Ast.Modifier;
 import {identifier, integer, keyword} from "./lexical-parser";
+import Modifier = Ast.Modifier;
 import Public = Ast.Public;
 import Protected = Ast.Protected;
 import MethodCall = Ast.MethodCall;
 import Expression = Ast.Expression;
 import Private = Ast.Private;
-import PackageLocal = Ast.PackageLocal;
 import Abstract = Ast.Abstract;
 import Open = Ast.Open;
 
@@ -36,11 +21,11 @@ const KEYWORDS: Array<string> = Array(
     "let"
 )
 
-function expressionParser():LazyParser<Expression> {
+function expressionParser(): P<Expression> {
     return eitherMany<Expression>(methodCall(), integer())
 }
 
-function modifier(): LazyParser<Modifier> {
+function modifier(): P<Modifier> {
     return eitherMany(
         keyword("public").map(() => Public),
         keyword("protected").map(result => Protected),
@@ -50,19 +35,19 @@ function modifier(): LazyParser<Modifier> {
     )
 }
 
-function methodCall(): LazyParser<MethodCall> {
-    return new LazyParser<Ast.MethodCall>(() => seq(
-            identifier(),
-            cut(capture(str("("))),
-            spaces(),
-            rep(expressionParser(), {sep: seq(spaces(),capture(str(",")), spaces())}),
-            spaces(),
+function methodCall(): P<MethodCall> {
+    return new P<Ast.MethodCall>(() => seq(
+        identifier(),
+        cut(capture(str("("))),
+        spaces(),
+        rep(expressionParser(), {sep: seq(spaces(), capture(str(",")), spaces())}),
+        spaces(),
         capture(str(")"))
-        )
+    )
         .map(result => ({
             name: result[0],
             expressions: result[2]
-        })).parserFn())
+        })).createParser())
 }
 
 export {modifier, methodCall, expressionParser}

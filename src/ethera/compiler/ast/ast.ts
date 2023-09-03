@@ -35,17 +35,22 @@ namespace Ast {
 
     export type SpecialRef = Super | This;
 
-    export class Super {}
+    export class Super {
+    }
 
-    export class This {}
+    export class This {
+    }
 
     export type TypeRel = Inherits | Extends | Equals;
 
-    export class Inherits {}
+    export class Inherits {
+    }
 
-    export class Extends {}
+    export class Extends {
+    }
 
-    export class Equals {}
+    export class Equals {
+    }
 
     export interface NameSpace {
         nameSpace: string[];
@@ -66,21 +71,29 @@ namespace Ast {
 
     export type Modifier = Public | Protected | Private | PackageLocal | Abstract | Open | Pure;
 
-    export class Public {}
+    export class Public {
+    }
 
-    export class Protected {}
+    export class Protected {
+    }
 
-    export class Private {}
+    export class Private {
+    }
 
-    export class PackageLocal {}
+    export class PackageLocal {
+    }
 
-    export class Abstract {}
+    export class Abstract {
+    }
 
-    export class Open {}
+    export class Open {
+    }
 
-    export class Pure {}
+    export class Pure {
+    }
 
-    export interface Block extends Statement {}
+    export interface Block extends Statement {
+    }
 
     export class Inline implements Block {
         expression: Expression
@@ -93,15 +106,16 @@ namespace Ast {
 
     }
 
-    export interface Expression {}
+    export interface Expression {
+    }
 
     export class BlockExpr implements Expression {
-         expressions: Expression[]
+        expressions: Expression[]
     }
 
     export class NestedExpr implements Expression {
 
-         expressions: Expression[]
+        expressions: Expression[]
     }
 
     export interface Identifier extends Expression {
@@ -109,40 +123,49 @@ namespace Ast {
     }
 
     export class MethodCall implements Expression {
-         name: string
-         expressions: Expression[]
+        name: string
+        expressions: Expression[]
     }
 
     export class NewClassInstance implements Expression {
-        constructor(public type: Type, public expression: Expression[], public anonymousClass: Statement | null) {}
+        constructor(public type: Type, public expression: Expression[], public anonymousClass: Statement | null) {
+        }
     }
 
     export class StringLiteral implements Expression {
-        constructor(public value: string) {}
+        constructor(public value: string) {
+        }
     }
 
     export class Ternary implements Expression {
-        constructor(public condition: Expression, public ifExpr: Expression, public elseExpr: Expression) {}
+        constructor(public condition: Expression, public ifExpr: Expression, public elseExpr: Expression) {
+        }
     }
 
-    export class Tuple implements Expression {}
+    export class Tuple implements Expression {
+    }
 
     export class BoolConst implements Expression {
-        constructor(public value: boolean) {}
+        constructor(public value: boolean) {
+        }
     }
 
-    export class Not implements Expression {}
+    export class Not implements Expression {
+    }
 
     export class ABinary implements Expression {
-        constructor(public op: ABinOp, public expression1: Expression, public expression2: Expression) {}
+        constructor(public op: ABinOp, public expression1: Expression, public expression2: Expression) {
+        }
     }
 
     export class BBinary implements Expression {
-        constructor(public op: BBinOp, public expression1: Expression, public expression2: Expression) {}
+        constructor(public op: BBinOp, public expression1: Expression, public expression2: Expression) {
+        }
     }
 
     export class RBinary implements Expression {
-        constructor(public op: RBinOp, public expression1: Expression, public expression2: Expression) {}
+        constructor(public op: RBinOp, public expression1: Expression, public expression2: Expression) {
+        }
     }
 
     export class IntConst implements Expression {
@@ -151,32 +174,41 @@ namespace Ast {
     }
 
     export class IntObject implements Expression {
-        constructor(public value: Statement) {}
+        constructor(public value: Statement) {
+        }
     }
 
     export class LongConst implements Expression {
-        constructor(public value: bigint) {}
+        constructor(public value: bigint) {
+        }
     }
 
     export class DoubleConst implements Expression {
-        constructor(public value: number) {}
+        constructor(public value: number) {
+        }
     }
 
     export class FloatConst implements Expression {
-        constructor(public value: number) {}
+        constructor(public value: number) {
+        }
     }
 
     export class Negate implements Expression {
-        constructor(public expression: Expression) {}
+        constructor(public expression: Expression) {
+        }
     }
 
-    export class ArrayValue implements Expression {}
+    export class ArrayValue implements Expression {
+    }
 
-    export class SpecialRefAsExpr implements Expression {}
+    export class SpecialRefAsExpr implements Expression {
+    }
 
-    export interface Model extends Statement {}
+    export interface Model extends Statement {
+    }
 
-    export interface Statement {}
+    export interface Statement {
+    }
 
     export class ClassModel implements Model {
         name: string;
@@ -217,12 +249,15 @@ namespace Ast {
         body: Block;
     }
 
-    export class For implements Statement {}
+    export class For implements Statement {
+    }
 
-    export class While implements Statement {}
+    export class While implements Statement {
+    }
 
     export class If implements Statement {
-        constructor(public condition: Expression, public ifBlock: Statement, public elseBlock: Statement | null) {}
+        constructor(public condition: Expression, public ifBlock: Statement, public elseBlock: Statement | null) {
+        }
     }
 
     export class Assign implements Statement {
@@ -244,27 +279,35 @@ namespace Ast {
         block: Block;
     }
 
-    export class Return implements Statement {}
+    export class Return implements Statement {
+    }
 
-    export class Lambda implements Statement {}
+    export class Lambda implements Statement {
+    }
 
     export class ExprAsStmt implements Statement {
-        constructor(public expression: Expression) {}
+        constructor(public expression: Expression) {
+        }
     }
 
     export class BlockStmt implements Statement {
-        constructor(public statements: Statement[]) {}
+        constructor(public statements: Statement[]) {
+        }
     }
 
-    export class Match implements Statement {}
+    export class Match implements Statement {
+    }
 
     export class Case {
-        constructor(public expression: Expression, public block: Block) {}
+        constructor(public expression: Expression, public block: Block) {
+        }
     }
 
-    export interface Operator {}
+    export interface Operator {
+    }
 
-    export interface ABinOp extends Operator {}
+    export interface ABinOp extends Operator {
+    }
 
     export interface ABinOp {
         Add,
@@ -273,14 +316,16 @@ namespace Ast {
         Divide,
     }
 
-    export interface BBinOp extends Operator {}
+    export interface BBinOp extends Operator {
+    }
 
     export interface BBinOp {
         And,
         Or,
     }
 
-    export interface RBinOp extends Operator {}
+    export interface RBinOp extends Operator {
+    }
 
     export interface RBinOp {
         GreaterEqual,

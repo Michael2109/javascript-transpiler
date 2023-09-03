@@ -1,28 +1,10 @@
-import {
-    charIn,
-    charsWhileIn,
-    cut,
-    digit,
-    either,
-    eitherMany,
-    LazyParser,
-    Parser,
-    rep,
-    seq,
-    spaces,
-    str
-} from "./parser";
+import {eitherMany, P, rep, seq, spaces, str} from "./parser";
 import {Ast} from "../compiler/ast/ast"
-import If = Ast.If;
-import Expression = Ast.Expression;
-import {keyword} from "./lexical-parser";
 import {expressionParser} from "./expression-parser";
-import Block = Ast.Block;
 import CurlyBraceBlock = Ast.CurlyBraceBlock;
 import Statement = Ast.Statement;
 import ExprAsStmt = Ast.ExprAsStmt;
 import BlockStmt = Ast.BlockStmt;
-
 
 
 /*function ifStatement(): Parser<If> {
@@ -34,18 +16,18 @@ import BlockStmt = Ast.BlockStmt;
 
 }*/
 
-function block(): LazyParser<BlockStmt> {
+function block(): P<BlockStmt> {
     // TODO Should repeat by either a semi-colon or a newline
-    return seq(spaces(), str("{"), spaces(), rep(statement(),{sep: spaces()}), spaces())
+    return seq(spaces(), str("{"), spaces(), rep(statement(), {sep: spaces()}), spaces())
         .map(result => new CurlyBraceBlock(result))
 }
 
-function statement(): LazyParser<Statement> {
+function statement(): P<Statement> {
     return eitherMany(expressionAsStatement())
 }
 
-function expressionAsStatement(): LazyParser<ExprAsStmt> {
+function expressionAsStatement(): P<ExprAsStmt> {
     return seq(spaces(), expressionParser(), spaces()).map(result => new ExprAsStmt(result))
 }
 
-export { block }
+export {block}
