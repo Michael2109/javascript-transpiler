@@ -18,7 +18,7 @@ import BlockStmt = Ast.BlockStmt;
 
 function block(): P<BlockStmt> {
     // TODO Should repeat by either a semi-colon or a newline
-    return seq(spaces(), str("{"), spaces(), rep(statement(), {sep: spaces()}), spaces())
+    return seq(spaces(), str("{"), spaces(), rep(statement(), {sep: spaces()}), spaces(), str("}"))
         .map(result => new CurlyBraceBlock(result))
 }
 

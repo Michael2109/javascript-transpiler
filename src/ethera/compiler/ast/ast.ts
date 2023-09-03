@@ -193,6 +193,11 @@ namespace Ast {
         }
     }
 
+    export class Variable implements Expression {
+        constructor(public name: string) {
+        }
+    }
+
     export class Negate implements Expression {
         constructor(public expression: Expression) {
         }

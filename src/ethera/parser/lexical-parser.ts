@@ -1,6 +1,7 @@
 import {capture, charIn, charsWhileIn, cut, digit, either, P, rep, seq, str} from "./parser";
 import {Ast} from "../compiler/ast/ast";
 import IntConst = Ast.IntConst;
+import Variable = Ast.Variable;
 
 
 const KEYWORDS: Array<string> = Array(
@@ -37,4 +38,8 @@ function integer(): P<IntConst> {
     return digit().map(result => new IntConst(BigInt(+result)))
 }
 
-export {letter, keyword, identifier, stringLiteral, integer}
+function variable(): P<Variable> {
+    return identifier().map(result => new Variable(result))
+}
+
+export {letter, keyword, identifier, stringLiteral, integer, variable}

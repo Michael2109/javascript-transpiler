@@ -1,6 +1,6 @@
 import {capture, cut, eitherMany, P, rep, seq, spaces, str} from "./parser";
 import {Ast} from "../compiler/ast/ast"
-import {identifier, integer, keyword} from "./lexical-parser";
+import {identifier, integer, keyword, variable} from "./lexical-parser";
 import Modifier = Ast.Modifier;
 import Public = Ast.Public;
 import Protected = Ast.Protected;
@@ -22,7 +22,7 @@ const KEYWORDS: Array<string> = Array(
 )
 
 function expressionParser(): P<Expression> {
-    return eitherMany<Expression>(methodCall(), integer())
+    return eitherMany<Expression>(methodCall(), integer(), variable())
 }
 
 function modifier(): P<Modifier> {
