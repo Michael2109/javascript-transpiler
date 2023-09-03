@@ -6,7 +6,7 @@
   "scripts": {
     "start": "npx tsc && node dist/app.js",
     "build": "tsc",
-    "test": "npx tsc && jest"
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
