@@ -1,14 +1,13 @@
-import {cut, either, eitherMany, opt, P, Parser, ParseResult, rep, seq, spaces, str} from "./parser";
+import {cut, either, eitherMany, opt, P, rep, seq, spaces, str} from "./parser";
 import {Ast} from "../compiler/ast/ast"
 import {expressionParser} from "./expression-parser";
+import {keyword} from "./lexical-parser";
 import CurlyBraceBlock = Ast.CurlyBraceBlock;
 import Statement = Ast.Statement;
 import ExprAsStmt = Ast.ExprAsStmt;
 import BlockStmt = Ast.BlockStmt;
-import {keyword} from "./lexical-parser";
 import Expression = Ast.Expression;
 import If = Ast.If;
-import exp from "constants";
 
 
 function ifStatement(): P<If> {
@@ -17,9 +16,7 @@ function ifStatement(): P<If> {
     }
 
     function elseParser(): P<Statement> {
-        return new P<Statement>(() => (input: string) => {
-                return either(seq(elifP(), opt(elseParser())).map(result => new If(result[0], result[1])), elseP()).createParser()(input)
-        })
+        return either(seq(elifP(), opt(elseParser())).map(result => new If(result[0], result[1])), elseP())
     }
 
     function elifP(): P<[Expression, Statement]> {

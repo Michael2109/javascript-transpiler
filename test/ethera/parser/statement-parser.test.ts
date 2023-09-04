@@ -13,8 +13,6 @@ test('Parse block', () => {
     assertSuccess(block().createParser()("{ x }"), new CurlyBraceBlock([new ExprAsStmt(new Variable("x"))]), "")
 });
 
-/*
-test('Parse if statement', () => {
+/*test('Parse if statement', () => {
     assertSuccess(ifStatement().createParser()("if(1){ }"), new If(new IntConst(BigInt(1)), new CurlyBraceBlock([]), undefined), "")
-});
-*/
+});*/
