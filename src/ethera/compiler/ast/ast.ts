@@ -261,7 +261,7 @@ namespace Ast {
     }
 
     export class If implements Statement {
-        constructor(public condition: Expression, public ifBlock: Statement, public elseBlock: Statement | null) {
+        constructor(public condition: Expression, public ifBlock: Statement, public elseBlock?: Statement) {
         }
     }
 
