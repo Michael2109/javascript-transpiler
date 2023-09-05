@@ -36,7 +36,7 @@ function modifier(): P<Modifier> {
 }
 
 function methodCall(): P<MethodCall> {
-    return new P<Ast.MethodCall>(() => seq(
+    return new P<Ast.MethodCall>( seq(
         identifier(),
         cut(capture(str("("))),
         spaces(),
@@ -47,7 +47,7 @@ function methodCall(): P<MethodCall> {
         .map(result => ({
             name: result[0],
             expressions: result[2]
-        })).createParser())
+        })).createParser)
 }
 
 export {modifier, methodCall, expressionParser}

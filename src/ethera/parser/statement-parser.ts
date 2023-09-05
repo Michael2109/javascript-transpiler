@@ -1,4 +1,4 @@
-import {cut, either, eitherMany, opt, P, rep, seq, spaces, str} from "./parser";
+import {cut, either, eitherMany, opt, P, Parser, rep, seq, spaces, str} from "./parser";
 import {Ast} from "../compiler/ast/ast"
 import {expressionParser} from "./expression-parser";
 import {keyword} from "./lexical-parser";
