@@ -70,7 +70,7 @@ function seq<T extends any[]>(...parsers: { [K in keyof T]: P<ElementTypeIfLengt
         let results: any[] = []
 
         for (const parser of parsers) {
-            let parseResult: ParseResult<any> = parser.createParser(input);
+            let parseResult: ParseResult<any> = parser.createParser(remainingInput);
             remainingInput = parseResult.remaining;
 
             if (parseResult.success) {
