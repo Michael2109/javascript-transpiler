@@ -1,4 +1,4 @@
-import {capture, cut, eitherMany, P, rep, seq, spaces, str} from "./parser";
+import {capture, cut, eitherMany, lazy, P, Parser, rep, seq, spaces, str} from "./parser";
 import {Ast} from "../compiler/ast/ast"
 import {identifier, integer, keyword, variable} from "./lexical-parser";
 import Modifier = Ast.Modifier;
@@ -36,18 +36,21 @@ function modifier(): P<Modifier> {
 }
 
 function methodCall(): P<MethodCall> {
-    return new P<Ast.MethodCall>( seq(
-        identifier(),
-        cut(capture(str("("))),
-        spaces(),
-        rep(expressionParser(), {sep: seq(spaces(), capture(str(",")), spaces())}),
-        spaces(),
-        capture(str(")"))
+
+    return lazy(() =>
+         seq(
+                identifier(),
+                cut(capture(str("("))),
+                spaces(),
+                rep(expressionParser(), {sep: seq(spaces(), capture(str(",")), spaces())}),
+                spaces(),
+                capture(str(")"))
+            )
+                .map<MethodCall>(result => ({
+                    name: result[0],
+                    expressions: result[2]
+                }))
     )
-        .map(result => ({
-            name: result[0],
-            expressions: result[2]
-        })).createParser)
 }
 
 export {modifier, methodCall, expressionParser}

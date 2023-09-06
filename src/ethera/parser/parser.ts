@@ -7,8 +7,8 @@ type Parser<T> = (input: string) => ParseResult<T>
 class P<T> {
     public readonly createParser: Parser<T>;
 
-    constructor(parserFn:  Parser<T>) {
-        this.createParser = parserFn;
+    constructor(parserFn:  Parser<T> ) {
+            this.createParser = parserFn;
     }
 
     map<U>(transform: (value: T) => U): P<U> {
@@ -49,6 +49,13 @@ interface ParseResult<T> {
     disallowBacktrack?: boolean
 }
 
+type FlattenArray<T> = T extends (infer U)[]
+    ? U extends any[]
+        ? FlattenArray<U>
+        : U
+    : T;
+
+
 type ElementTypeIfLengthOne<T extends any[]> = T['length'] extends 1 ? T[0] : T;
 
 type FilterOutVoid<T extends any[]> = T extends [infer Head, ...infer Rest]
@@ -87,6 +94,12 @@ function seq<T extends any[]>(...parsers: { [K in keyof T]: P<ElementTypeIfLengt
             value: filteredResults.length > 1 ? filteredResults : filteredResults[0],
             remaining: remainingInput
         };
+    })
+}
+
+function lazy<T>(fn: () => P<T>): P<T> {
+    return new P<T>( (input: string) => {
+        return fn().createParser(input)
     })
 }
 
@@ -298,6 +311,7 @@ export {
     Parser,
     P,
     ParseResult,
+    lazy,
     capture,
     either,
     eitherMany,
