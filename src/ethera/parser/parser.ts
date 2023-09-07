@@ -1,4 +1,5 @@
 import {variable} from "./lexical-parser";
+import {Optional} from "./optional";
 
 const DIGIT_REGEX: RegExp = new RegExp(`^[0-9]+`);
 
@@ -48,13 +49,6 @@ interface ParseResult<T> {
     remaining: string;
     disallowBacktrack?: boolean
 }
-
-type FlattenArray<T> = T extends (infer U)[]
-    ? U extends any[]
-        ? FlattenArray<U>
-        : U
-    : T;
-
 
 type ElementTypeIfLengthOne<T extends any[]> = T['length'] extends 1 ? T[0] : T;
 
@@ -282,15 +276,15 @@ function rep<T>(parser: P<T>, options?: {
     })
 }
 
-function opt<T>(parser: P<T>): P<T | void> {
-    return new P<T | void>( (input: string) => {
+function opt<T>(parser: P<T>): P<Optional<T>> {
+    return new P<Optional<T>>( (input: string) => {
 
 
         const parseResult = parser.createParser(input);
         if (parseResult.success) {
-            return parseResult;
+            return {success: true, value: new Optional(parseResult.value), remaining: parseResult.remaining};
         }
-        return {success: true, value: undefined, remaining: parseResult.remaining}
+        return {success: true, value: new Optional(undefined), remaining: parseResult.remaining}
 
     })
 }

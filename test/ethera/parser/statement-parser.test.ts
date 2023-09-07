@@ -6,6 +6,7 @@ import ExprAsStmt = Ast.ExprAsStmt;
 import Variable = Ast.Variable;
 import If = Ast.If;
 import IntConst = Ast.IntConst;
+import {Optional} from "../../../src/ethera/parser/optional";
 
 
 test('Parse block', () => {

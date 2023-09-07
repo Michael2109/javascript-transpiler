@@ -21,7 +21,7 @@ function letter(): P<string> {
 }
 
 function keyword(s: string): P<void> {
-    return capture(str(s)).filter(s => KEYWORDS.includes(s)).map((value) => {
+    return capture(str(s)).filter(s => KEYWORDS.includes(s)).map(() => {
     })
 }
 
