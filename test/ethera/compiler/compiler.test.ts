@@ -11,13 +11,11 @@ test('Test parse and compile  to JavaScript', () => {
     const input = `
     class Test {
    
-        let methodname(){
+        let methodName(){
         
         }
     
-    }
-   
-    `
+    }`
 
     const parseResult = compilationUnit().createParser(input);
 

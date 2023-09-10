@@ -22,7 +22,7 @@ export namespace CodeGenerator {
                 return  methodToCode(statement as Ir.Method)
 
             default:
-                return "Not found: " + statement.constructor + JSON.stringify(statement)
+                throw new Error("Not found: " + JSON.stringify(statement))
         }
     }
 

@@ -12,14 +12,14 @@ import RefLocal = Ast.RefLocal;
 import ClassModel = Ast.ClassModel;
 
 test('Parse block', () => {
-    assertSuccess(block().createParser("{ }"), new CurlyBraceBlock([]), "")
-    assertSuccess(block().createParser("{ x }"), new CurlyBraceBlock([new ExprAsStmt(new Variable("x"))]), "")
+    assertSuccess(block().createParser("{ }"), [], "")
+    assertSuccess(block().createParser("{ x }"), [new ExprAsStmt(new Variable("x"))], "")
 });
 
 test('Parse if statement', () => {
-    assertSuccess(ifStatement().createParser("if(1){ }"), new If(new IntConst(BigInt(1)), new CurlyBraceBlock([]), undefined), "")
-    assertSuccess(ifStatement().createParser("if(1){ } else {}"), new If(new IntConst(BigInt(1)), new CurlyBraceBlock([]), new CurlyBraceBlock([])), "")
-    assertSuccess(ifStatement().createParser("if(1){ } else if(2) {} else {}"), new If(new IntConst(BigInt(1)), new CurlyBraceBlock([]), new If(new IntConst(BigInt(2)), new CurlyBraceBlock([]), new CurlyBraceBlock([]))), "")
+    assertSuccess(ifStatement().createParser("if(1){ }"), new If(new IntConst(BigInt(1)), [], undefined), "")
+    assertSuccess(ifStatement().createParser("if(1){ } else {}"), new If(new IntConst(BigInt(1)), [], []), "")
+    assertSuccess(ifStatement().createParser("if(1){ } else if(2) {} else {}"), new If(new IntConst(BigInt(1)),[], new If(new IntConst(BigInt(2)), [], [])), "")
 
 });
 
@@ -44,9 +44,9 @@ test('Parse class', () => {
 });
 
 test('Parse method', () => {
-    assertSuccess(method().createParser("let methodName(){ }"), new Method("methodName", [], [], [], undefined, new CurlyBraceBlock([])), "")
-    assertSuccess(method().createParser("let methodName(x: Int, y: String){ }"), new Method("methodName", [], [new Field("x", new RefLocal("Int")), new Field("y", new RefLocal("String"))], [], undefined, new CurlyBraceBlock([])), "")
-    assertSuccess(method().createParser("let methodName(): ClassName{ }"), new Method("methodName", [], [], [], new RefLocal("ClassName"), new CurlyBraceBlock([])), "")
+    assertSuccess(method().createParser("let methodName(){ }"), new Method("methodName", [], [], [], undefined, []), "")
+    assertSuccess(method().createParser("let methodName(x: Int, y: String){ }"), new Method("methodName", [], [new Field("x", new RefLocal("Int")), new Field("y", new RefLocal("String"))], [], undefined, []), "")
+    assertSuccess(method().createParser("let methodName(): ClassName{ }"), new Method("methodName", [], [], [], new RefLocal("ClassName"), []), "")
 });
 
 test('Parse block comment', () => {
