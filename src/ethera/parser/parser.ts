@@ -50,7 +50,7 @@ interface ParseResult<T> {
     disallowBacktrack?: boolean
 }
 
-type ElementTypeIfLengthOne<T extends any[]> = T['length'] extends 1 ? T[0] : T;
+type ElementTypeIfLengthOneOrZero<T extends any[]> = T['length'] extends 1 ? T[0] : ( T['length'] extends 0 ? void :T);
 
 type FilterOutVoid<T extends any[]> = T extends [infer Head, ...infer Rest]
     ? Head extends void
@@ -62,7 +62,7 @@ function removeVoidFromTuple<T extends any[]>(tuple: T): FilterOutVoid<T> {
     return tuple.filter((item) => item !== undefined) as FilterOutVoid<T>;
 }
 
-function seq<T extends any[]>(...parsers: { [K in keyof T]: P<ElementTypeIfLengthOne<FilterOutVoid<T[K]>>> }): P<ElementTypeIfLengthOne<FilterOutVoid<T>>> {
+function seq<T extends any[]>(...parsers: { [K in keyof T]: P<ElementTypeIfLengthOneOrZero<FilterOutVoid<T[K]>>> }): P<ElementTypeIfLengthOneOrZero<FilterOutVoid<T>>> {
 
     return new P((input: string) => {
 
@@ -167,14 +167,14 @@ function str(expected: string): P<void> {
     })
 }
 
-function regex(expected: RegExp): P<string> {
+function regex(expected: RegExp): P<void> {
 
-    return new P<string>( (input: string) => {
+    return new P<void>( (input: string) => {
 
         const match = input.match(expected);
 
         if (match) {
-            return {success: true, value: match[0], remaining: input.slice(match[0].length)};
+            return {success: true, value: undefined, stringValue: match[0], remaining: input.slice(match[0].length)};
         }
 
         return {success: false, value: undefined, remaining: input};
@@ -183,7 +183,7 @@ function regex(expected: RegExp): P<string> {
 }
 
 function digit(): P<string> {
-    return regex(DIGIT_REGEX)
+    return capture(regex(DIGIT_REGEX))
 }
 
 function end(): P<void> {

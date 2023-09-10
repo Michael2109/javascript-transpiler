@@ -9,10 +9,9 @@ namespace Ast {
         loc: string[];
     }
 
-    export interface Field {
-        name: string;
-        type: Type;
-        init: Type | null;
+    export class Field {
+        constructor(name: string, ref: Ref, init?: Expression) {
+        }
     }
 
     export interface Type {
@@ -21,12 +20,15 @@ namespace Ast {
 
     export type Ref = RefSpecial | RefLocal | RefQual;
 
-    export interface RefSpecial {
-        specialRef: SpecialRef;
+    export class RefSpecial {
+        constructor(public specialRef: SpecialRef) {
+
+        }
     }
 
-    export interface RefLocal {
-        name: string;
+    export class RefLocal {
+        constructor(public name: string) {
+        }
     }
 
     export interface RefQual {
@@ -216,13 +218,17 @@ namespace Ast {
     }
 
     export class ClassModel implements Model {
-        name: string;
-        modifiers: Modifier[];
-        fields: Field[];
-        parent: Type | null;
-        parentArguments: Expression[];
-        interfaces: Type[];
-        statements: Statement[];
+        constructor(
+          public  name: string,
+        public modifiers: Modifier[],
+        public fields: Field[],
+        public parent: Type | undefined,
+        public  parentArguments: Expression[],
+        public  interfaces: Type[],
+        public  statements: Statement[]
+        ) {
+        }
+
     }
 
     export class ObjectModel implements Model {
@@ -246,12 +252,14 @@ namespace Ast {
     }
 
     export class Method implements Statement {
-        name: string;
-        annotations: Annotation[];
-        fields: Field[];
-        modifiers: Modifier[];
-        returnType: Type | null;
-        body: Block;
+        constructor(public  name: string,
+                    public annotations: Annotation[],
+                    public fields: Field[],
+                    public modifiers: Modifier[],
+                    public  returnType: Ref | undefined,
+                    public   body: Block) {
+        }
+
     }
 
     export class For implements Statement {
