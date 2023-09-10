@@ -2,11 +2,15 @@
   "name": "compiler",
   "version": "1.0.0",
   "description": "",
-  "main": "src/app.ts",
+  "main": "src/app.js",
   "scripts": {
     "start": "npx tsc && node dist/app.js",
     "build": "tsc",
-    "test": "npx tsc && jest"
+    "test": "npx tsc && jest",
+    "global-install": "npm install -g ."
+  },
+  "bin": {
+    "my-compiler-example": "src/app.js"
   },
   "keywords": [],
   "author": "",

@@ -276,10 +276,12 @@ namespace Ast {
     }
 
     export class Assign implements Statement {
-        name: string;
-        type: Type | null;
-        immutable: boolean;
-        block: Block;
+        constructor(public name: string,
+        public  type: Ref | undefined,
+        public  immutable: boolean,
+        public statement: Statement) {
+        }
+
     }
 
     export class AssignMultiple implements Statement {
@@ -290,8 +292,10 @@ namespace Ast {
     }
 
     export class Reassign implements Statement {
-        name: Name;
-        block: Block;
+        constructor(public  name: string,
+        public  block: Block) {
+        }
+
     }
 
     export class Return implements Statement {

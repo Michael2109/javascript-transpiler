@@ -1,6 +1,14 @@
 import {Ast} from "../../../src/ethera/compiler/ast/ast";
 import {assertSuccess} from "./parser-test-utils";
-import {block, classParser, comment, field, ifStatement, method} from "../../../src/ethera/parser/statement-parser";
+import {
+    assign,
+    block,
+    classParser,
+    comment,
+    field,
+    ifStatement,
+    method, reassign
+} from "../../../src/ethera/parser/statement-parser";
 import CurlyBraceBlock = Ast.CurlyBraceBlock;
 import ExprAsStmt = Ast.ExprAsStmt;
 import Variable = Ast.Variable;
@@ -10,6 +18,8 @@ import Method = Ast.Method;
 import Field = Ast.Field;
 import RefLocal = Ast.RefLocal;
 import ClassModel = Ast.ClassModel;
+import Assign = Ast.Assign;
+import Reassign = Ast.Reassign;
 
 test('Parse block', () => {
     assertSuccess(block().createParser("{ }"), [], "")
@@ -22,6 +32,19 @@ test('Parse if statement', () => {
     assertSuccess(ifStatement().createParser("if(1){ } else if(2) {} else {}"), new If(new IntConst(BigInt(1)),[], new If(new IntConst(BigInt(2)), [], [])), "")
 
 });
+
+test('Parse assignment', () => {
+    assertSuccess(assign().createParser("let x = 10"),
+        new Assign("x",undefined, true, new ExprAsStmt(new IntConst(BigInt(10)))),
+        "")
+});
+
+test('Parse reassignment', () => {
+    assertSuccess(reassign().createParser("x <- 10"),
+        new Reassign("x",new ExprAsStmt(new IntConst(BigInt(10)))),
+        "")
+});
+
 
 test('Parse field', () => {
     assertSuccess(field().createParser("x: ClassName"),

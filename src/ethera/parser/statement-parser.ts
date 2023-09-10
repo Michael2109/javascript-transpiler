@@ -14,6 +14,8 @@ import Ref = Ast.Ref;
 import RefLocal = Ast.RefLocal;
 import ClassModel = Ast.ClassModel;
 import CompilationUnit = Ast.CompilationUnit;
+import Assign = Ast.Assign;
+import Reassign = Ast.Reassign;
 
 function compilationUnit(): P<CompilationUnit> {
     return rep(classParser()).map(results => new CompilationUnit(
@@ -128,8 +130,46 @@ function statement(): P<Statement> {
     )
 }
 
+function assign(): P<Assign> {
+    return seq(
+        str("let"),
+        spaces(),
+        identifier(),
+        spaces(),
+        opt(seq(
+            str(":"),
+            spaces(),
+            typeRef(),
+    spaces()
+            )),
+            str("="),
+            statement()
+        ).map(results => new Assign(
+            results[0],
+            results[1].get(),
+            true,
+            results[2]
+        )
+    )
+}
+
+function reassign(): P<Reassign> {
+    return seq(
+        spaces(),
+        identifier(),
+        spaces(),
+        str("<-"),
+        statement()
+    ).map(results => new Reassign(
+            results[0],
+            results[1]
+        )
+    )
+}
+
+
 function expressionAsStatement(): P<ExprAsStmt> {
     return seq(spaces(), expressionParser(), spaces()).map(result => new ExprAsStmt(result))
 }
 
-export {compilationUnit, block, ifStatement, method, field, typeRef, comment, classParser}
+export {compilationUnit, block, ifStatement, method, field, typeRef, comment, classParser, assign, reassign}
