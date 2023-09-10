@@ -11,7 +11,7 @@ export namespace CodeGenerator {
     }
 
     function methodToCode(method: Ir.Method): string {
-        return `function ${method.name} {` + method.statements.map(statementToCode) + "}"
+        return `${method.name}(){` + method.statements.map(statementToCode) + "}"
     }
 
     function statementToCode(statement: Ir.Statement): string {

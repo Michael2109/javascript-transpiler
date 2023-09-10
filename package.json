@@ -2,15 +2,15 @@
   "name": "compiler",
   "version": "1.0.0",
   "description": "",
-  "main": "src/app.ts",
+  "main": "dist/app.js",
   "scripts": {
     "start": "npx tsc && node dist/app.js",
     "build": "tsc",
     "test": "npx tsc && jest",
-    "run": "npm install -g . && my-compiler-example"
+    "compile": "npx tsc && npm install -g . && cd src && compiler"
   },
   "bin": {
-    "my-compiler-example": "./bin.js"
+    "compiler": "dist/app.js"
   },
   "keywords": [],
   "author": "",
@@ -23,6 +23,8 @@
     "typescript": "^5.2.2"
   },
   "dependencies": {
+    "@types/js-beautify": "^1.14.0",
+    "js-beautify": "^1.14.9",
     "ts-node": "^10.9.1"
   }
 }

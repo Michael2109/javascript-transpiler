@@ -1,39 +1,54 @@
-import * as fs from 'fs';
-import * as path from 'path';
+#!/usr/bin/env node
+
+import {compilationUnit} from "./lumina/parser/statement-parser";
+import {AstToIr} from "./lumina/compiler/ast/ast-to-ir";
+import {CodeGenerator} from "./lumina/compiler/codegen/code-generator";
+import {Ir} from "./lumina/compiler/ast/ir";
+import {Ast} from "./lumina/compiler/ast/ast";
+import CompilationUnit = Ast.CompilationUnit;
+import js_beautify from "js-beautify";
 
 console.log("Do something else")
-function listFilesRecursivelySync(dir: string): string[] {
-    try {
-        const files: string[] = fs.readdirSync(dir);
+const { promisify } = require('util');
+const { resolve } = require('path');
+const fs = require('fs');
+const readdir = promisify(fs.readdir);
+const stat = promisify(fs.stat);
 
-        for (const file of files) {
-            const filePath = path.join(dir, file);
-            const stat = fs.statSync(filePath);
-
-            if (stat.isDirectory()) {
-                // Recursively process subdirectories
-                const subdirectoryFiles = listFilesRecursivelySync(filePath);
-                files.push(...subdirectoryFiles);
-            } else {
-                // Add file path to the list
-                files.push(filePath);
-            }
-        }
-
-        return files;
-    } catch (error) {
-        console.error(`Error reading directory: ${dir}`);
-        console.error(error);
-        return [];
-    }
+async function getFiles(dir) {
+    const subdirs = await readdir(dir);
+    const files = await Promise.all(subdirs.map(async (subdir) => {
+        const res = resolve(dir, subdir);
+        return (await stat(res)).isDirectory() ? getFiles(res) : res;
+    }));
+    return files.reduce((a, f) => a.concat(f), []);
 }
 
-// Call the function with the current directory
-const fileList = listFilesRecursivelySync(__dirname);
+getFiles(".").then(files => {
+        const luminaFiles = files.filter(isLuminaFile)
 
-if (fileList.length > 0) {
-    console.log('List of files:');
-    fileList.forEach((file) => console.log(file));
-} else {
-    console.log('No files found.');
+    luminaFiles.forEach(file => {
+
+        const fileContent = fs.readFileSync(file,'utf8')
+        const parseResult = compilationUnit().createParser(fileContent);
+
+        console.log(JSON.stringify(parseResult))
+
+        const value: CompilationUnit = parseResult.value
+
+        console.log(JSON.stringify(AstToIr.compilationUnitToIr(value)))
+
+        const code = js_beautify.js_beautify(CodeGenerator.compilationUnitToCode(AstToIr.compilationUnitToIr(value)))
+
+        const newFileName  = file.substr(0, file.lastIndexOf(".")) + ".js";
+        console.log(newFileName)
+
+        fs.writeFileSync(newFileName, code)
+    })
+
+    }
+)
+
+function isLuminaFile(filePath: string): boolean {
+    return filePath.endsWith(".lumina")
 }
