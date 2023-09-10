@@ -134,7 +134,7 @@ function charsWhileIn(chars: string): P<string> {
 function spaces(): P<void> {
     return new P<void>( (input: string) => {
 
-        return charsWhileIn(" \r\n").map(() => {
+        return charsWhileIn(" \r\n\t").map(() => {
         }).createParser(input)
     })
 }

@@ -1,8 +1,10 @@
 namespace Ast {
-    export interface CompilationUnit {
-        nameSpace: NameSpace;
-        imports: Import[];
-        models: Model[];
+    export class CompilationUnit {
+        constructor(   public nameSpace: NameSpace,
+        public imports: Import[],
+        public models: Model[]) {
+        }
+
     }
 
     export interface Import {
@@ -257,7 +259,7 @@ namespace Ast {
                     public fields: Field[],
                     public modifiers: Modifier[],
                     public  returnType: Ref | undefined,
-                    public   body: Block) {
+                    public   statements: Array<Statement>) {
         }
 
     }

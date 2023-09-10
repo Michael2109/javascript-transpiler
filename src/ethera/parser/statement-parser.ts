@@ -13,6 +13,15 @@ import Field = Ast.Field;
 import Ref = Ast.Ref;
 import RefLocal = Ast.RefLocal;
 import ClassModel = Ast.ClassModel;
+import CompilationUnit = Ast.CompilationUnit;
+
+function compilationUnit(): P<CompilationUnit> {
+    return rep(classParser()).map(results => new CompilationUnit(
+        {nameSpace: []},
+        [],
+        results
+    ))
+}
 
 function classParser(): P<ClassModel> {
 
@@ -31,7 +40,7 @@ function classParser(): P<ClassModel> {
             undefined,
             [],
             [],
-            results[1].statements
+            results[1]
         ))
 }
 
@@ -107,18 +116,20 @@ function ifStatement(): P<If> {
     })
 }
 
-function block(): P<BlockStmt> {
+function block(): P<Array<Statement>> {
     // TODO Should repeat by either a semi-colon or a newline
-    return seq(spaces(), str("{"), spaces(), rep(statement(), {sep: spaces()}), spaces(), str("}"))
-        .map(result => new CurlyBraceBlock(result))
+    return seq(spaces(), str("{"), spaces(), rep(statement(), {sep: spaces()}), spaces(), str("}"), spaces())
+        .map(result => result)
 }
 
 function statement(): P<Statement> {
-    return eitherMany(expressionAsStatement())
+    return lazy(() =>
+        eitherMany<Statement>(classParser(), method(), expressionAsStatement())
+    )
 }
 
 function expressionAsStatement(): P<ExprAsStmt> {
     return seq(spaces(), expressionParser(), spaces()).map(result => new ExprAsStmt(result))
 }
 
-export {block, ifStatement, method, field, typeRef, comment, classParser}
+export {compilationUnit, block, ifStatement, method, field, typeRef, comment, classParser}
