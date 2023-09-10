@@ -1,4 +1,4 @@
-import {Ast} from "../../../src/ethera/compiler/ast/ast";
+import {Ast} from "../../../src/lumina/compiler/ast/ast";
 import {assertSuccess} from "./parser-test-utils";
 import {
     assign,
@@ -8,7 +8,7 @@ import {
     field,
     ifStatement,
     method, reassign
-} from "../../../src/ethera/parser/statement-parser";
+} from "../../../src/lumina/parser/statement-parser";
 import CurlyBraceBlock = Ast.CurlyBraceBlock;
 import ExprAsStmt = Ast.ExprAsStmt;
 import Variable = Ast.Variable;

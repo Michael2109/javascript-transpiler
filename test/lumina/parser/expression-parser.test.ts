@@ -1,6 +1,6 @@
 import {assertFail, assertSuccess} from "./parser-test-utils";
-import {expressionParser, methodCall, modifier} from "../../../src/ethera/parser/expression-parser";
-import {Ast} from "../../../src/ethera/compiler/ast/ast";
+import {expressionParser, methodCall, modifier} from "../../../src/lumina/parser/expression-parser";
+import {Ast} from "../../../src/lumina/compiler/ast/ast";
 import Public = Ast.Public;
 import Protected = Ast.Protected;
 import IntConst = Ast.IntConst;

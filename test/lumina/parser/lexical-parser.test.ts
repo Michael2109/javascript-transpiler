@@ -1,6 +1,6 @@
-import {identifier, integer, keyword, stringLiteral, variable} from "../../../src/ethera/parser/lexical-parser";
+import {identifier, integer, keyword, stringLiteral, variable} from "../../../src/lumina/parser/lexical-parser";
 import {assertFail, assertSuccess} from "./parser-test-utils";
-import {Ast} from "../../../src/ethera/compiler/ast/ast";
+import {Ast} from "../../../src/lumina/compiler/ast/ast";
 import IntConst = Ast.IntConst;
 import Variable = Ast.Variable;
 

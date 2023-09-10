@@ -11,7 +11,7 @@ import {
     seq,
     spaces,
     str
-} from "../../../src/ethera/parser/parser";
+} from "../../../src/lumina/parser/parser";
 import {assertFail, assertSuccess} from "./parser-test-utils";
 
 test('Strings', () => {

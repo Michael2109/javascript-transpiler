@@ -1,4 +1,4 @@
-import {ParseResult} from "../../../src/ethera/parser/parser";
+import {ParseResult} from "../../../src/lumina/parser/parser";
 
 function assertSuccess<T>(parseResult: ParseResult<T>, expectedValue: T, expectedRemaining: string) {
     expect(parseResult.success).toBeTruthy()
