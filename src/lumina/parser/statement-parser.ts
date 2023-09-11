@@ -45,6 +45,7 @@ function classParser(): P<ClassModel> {
         identifier(),
         spaces(),
         block()
+
     )
         .map(results => new ClassModel(
             results[0],
