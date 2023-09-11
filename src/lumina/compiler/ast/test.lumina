@@ -1,5 +1,13 @@
 class ClassName {
     let methodName(){
 
+        let evenMoreMethods(){
+
+
+        }
     }
+}
+
+let anotherMethod(){
+
 }

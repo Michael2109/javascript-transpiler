@@ -2,13 +2,14 @@ namespace Ast {
     export class CompilationUnit {
         constructor(   public nameSpace: NameSpace,
         public imports: Import[],
-        public models: Model[]) {
+        public statements: Model[]) {
         }
 
     }
 
-    export interface Import {
-        loc: string[];
+    export class Import {
+        constructor(public loc: string[]) {
+        }
     }
 
     export class Field {

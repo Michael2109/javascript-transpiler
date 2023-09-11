@@ -1,4 +1,4 @@
-import {cut, either, eitherMany, lazy, opt, P, regex, rep, seq, spaces, str} from "./parser";
+import {capture, cut, either, eitherMany, lazy, opt, P, regex, rep, seq, spaces, str} from "./parser";
 import {Ast} from "../compiler/ast/ast"
 import {expressionParser} from "./expression-parser";
 import {identifier, keyword} from "./lexical-parser";
@@ -16,13 +16,24 @@ import ClassModel = Ast.ClassModel;
 import CompilationUnit = Ast.CompilationUnit;
 import Assign = Ast.Assign;
 import Reassign = Ast.Reassign;
+import Import = Ast.Import;
 
 function compilationUnit(): P<CompilationUnit> {
-    return rep(classParser()).map(results => new CompilationUnit(
+    return rep(statement()).map(results => new CompilationUnit(
         {nameSpace: []},
         [],
         results
     ))
+}
+
+function importParser(): P<Import> {
+    // import {variable} from "./lexical-parser";
+    return seq(
+        keyword("import"),
+        spaces(),
+        rep(identifier(), {sep: seq(spaces(), str("."), spaces())})
+    )
+        .map(results => new Import(results))
 }
 
 function classParser(): P<ClassModel> {
@@ -62,7 +73,7 @@ function method(): P<Method> {
         ),
         spaces(),
         block())
-        .map(result => new Method(result[0], [], result[1], [], result[2].get(), result[3])
+        .map(result => new Method(result[0],[], result[1], [], result[2].get(), result[3])
         )
 }
 
@@ -172,4 +183,4 @@ function expressionAsStatement(): P<ExprAsStmt> {
     return seq(spaces(), expressionParser(), spaces()).map(result => new ExprAsStmt(result))
 }
 
-export {compilationUnit, block, ifStatement, method, field, typeRef, comment, classParser, assign, reassign}
+export {compilationUnit, block, ifStatement, method, field, typeRef, comment, classParser, assign, reassign, statement}

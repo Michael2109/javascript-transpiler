@@ -1,7 +1,7 @@
 namespace Ir {
 
     export class CompilationUnit {
-        constructor(public models: Array<Statement>) {
+        constructor(public statements: Array<Statement>) {
         }
     }
 
@@ -13,6 +13,12 @@ namespace Ir {
     }
 
     export class Method extends Statement{
+        constructor(public name: string, public statements: Array<Statement>) {
+            super()
+        }
+    }
+
+    export class ModuleMethod extends Statement{
         constructor(public name: string, public statements: Array<Statement>) {
             super()
         }

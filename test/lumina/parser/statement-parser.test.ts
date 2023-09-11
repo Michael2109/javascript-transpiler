@@ -7,7 +7,7 @@ import {
     comment,
     field,
     ifStatement,
-    method, reassign
+    method, reassign, statement
 } from "../../../src/lumina/parser/statement-parser";
 import CurlyBraceBlock = Ast.CurlyBraceBlock;
 import ExprAsStmt = Ast.ExprAsStmt;
