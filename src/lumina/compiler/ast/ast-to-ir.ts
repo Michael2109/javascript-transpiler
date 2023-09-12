@@ -36,6 +36,8 @@ export namespace AstToIr {
                 return   classModelToIr(statement as ClassModel, irState)
              case Method:
                  return  irState.isModule ?moduleMethodToIr(statement as Method, irState) : methodToIr(statement as Method, irState)
+             default:
+                 throw new Error("Unknown statement: " + statement)
         }
     }
 

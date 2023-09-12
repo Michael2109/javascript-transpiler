@@ -9,7 +9,6 @@ import {
     ifStatement,
     method, reassign, statement
 } from "../../../src/lumina/parser/statement-parser";
-import CurlyBraceBlock = Ast.CurlyBraceBlock;
 import ExprAsStmt = Ast.ExprAsStmt;
 import Variable = Ast.Variable;
 import If = Ast.If;

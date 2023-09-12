@@ -1,10 +1,7 @@
 class ClassName {
     let methodName(){
 
-        let evenMoreMethods(){
 
-
-        }
     }
 }
 

@@ -100,27 +100,7 @@ namespace Ast {
     export interface Block extends Statement {
     }
 
-    export class Inline implements Block {
-        expression: Expression
-    }
-
-    export class CurlyBraceBlock implements Block {
-
-        constructor(public statements: Statement[]) {
-        }
-
-    }
-
     export interface Expression {
-    }
-
-    export class BlockExpr implements Expression {
-        expressions: Expression[]
-    }
-
-    export class NestedExpr implements Expression {
-
-        expressions: Expression[]
     }
 
     export interface Identifier extends Expression {
@@ -128,8 +108,8 @@ namespace Ast {
     }
 
     export class MethodCall implements Expression {
-        name: string
-        expressions: Expression[]
+        constructor(public name:string,   public expressions: Expression[]) {
+        }
     }
 
     export class NewClassInstance implements Expression {
@@ -234,26 +214,6 @@ namespace Ast {
 
     }
 
-    export class ObjectModel implements Model {
-        name: Name;
-        modifiers: Modifier[];
-        fields: Field[];
-        parent: Type | null;
-        parentArguments: Expression[];
-        interfaces: Type[];
-        body: Statement[];
-    }
-
-    export class TraitModel implements Model {
-        name: Name;
-        modifiers: Modifier[];
-        fields: Field[];
-        parent: Type | null;
-        parentArguments: Expression[];
-        interfaces: Type[];
-        body: Statement[];
-    }
-
     export class Method implements Statement {
         constructor(public  name: string,
                     public annotations: Annotation[],
@@ -283,13 +243,6 @@ namespace Ast {
         public statement: Statement) {
         }
 
-    }
-
-    export class AssignMultiple implements Statement {
-        name: Name[];
-        type: Type | null;
-        immutable: boolean;
-        block: Block;
     }
 
     export class Reassign implements Statement {
@@ -323,37 +276,39 @@ namespace Ast {
         }
     }
 
-    export interface Operator {
+    export abstract class Operator {
     }
 
-    export interface ABinOp extends Operator {
+    export abstract class ABinOp {
+
     }
 
-    export interface ABinOp {
-        Add,
-        Subtract,
-        Multiply,
-        Divide,
+    export class Add extends ABinOp {
+        value = "Add"
     }
+    export class Subtract extends ABinOp {
+        value = "Subtract"
+    }
+    export class Multiply extends ABinOp {  value = "Multiply"}
+    export class Divide extends ABinOp {value = "Divide"}
 
     export interface BBinOp extends Operator {
     }
 
-    export interface BBinOp {
-        And,
-        Or,
+    export abstract class BBinOp extends Operator{
+
     }
 
-    export interface RBinOp extends Operator {
-    }
+    export class And extends BBinOp {}
+    export class Or extends BBinOp {}
 
-    export interface RBinOp {
-        GreaterEqual,
-        Greater,
-        LessEqual,
-        Less,
-        Equal,
-    }
+    export abstract class RBinOp extends Operator {}
+
+    export class GreaterEqual extends RBinOp {}
+    export class Greater extends RBinOp {}
+    export class LessEqual extends RBinOp {}
+    export class Less extends RBinOp {}
+    export class Equal extends RBinOp {}
 }
 
 export {Ast}

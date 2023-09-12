@@ -2,10 +2,8 @@ import {capture, cut, either, eitherMany, lazy, opt, P, regex, rep, seq, spaces,
 import {Ast} from "../compiler/ast/ast"
 import {expressionParser} from "./expression-parser";
 import {identifier, keyword} from "./lexical-parser";
-import CurlyBraceBlock = Ast.CurlyBraceBlock;
 import Statement = Ast.Statement;
 import ExprAsStmt = Ast.ExprAsStmt;
-import BlockStmt = Ast.BlockStmt;
 import Expression = Ast.Expression;
 import If = Ast.If;
 import Method = Ast.Method;

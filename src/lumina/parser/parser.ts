@@ -18,6 +18,7 @@ class P<T> {
 
         const p: Parser<U> = (input: string) => {
             const parseResult: ParseResult<T> = t.createParser(input);
+            // @ts-ignore
             const transformedValue: U = parseResult.success ? transform(parseResult.value) : undefined;
 
             return {
@@ -98,6 +99,7 @@ function lazy<T>(fn: () => P<T>): P<T> {
 }
 
 function charIn(charPattern: string): P<string> {
+    // @ts-ignore
     return new P<string>((input: string) => {
 
         const match = input.match(`^[${charPattern}]`);
@@ -140,6 +142,7 @@ function spaces(): P<void> {
 }
 
 function capture(parser: P<void>): P<string> {
+    // @ts-ignore
     return new P<string>( (input: string) => {
         const parseResult = parser.createParser(input)
 
@@ -196,7 +199,7 @@ function end(): P<void> {
 }
 
 function either<T, U>(parserA: P<T>, parserB: P<U>): P<T | U> {
-
+// @ts-ignore
     return new P<T | U>( (input: string) => {
 
         const result = parserA.createParser(input);
@@ -212,7 +215,7 @@ function either<T, U>(parserA: P<T>, parserB: P<U>): P<T | U> {
 }
 
 function eitherMany<T>(...parsers: Array<P<T>>): P<T> {
-
+// @ts-ignore
     return new P<T>( (input: string) => {
 
         for (let parser of parsers) {
@@ -277,6 +280,7 @@ function rep<T>(parser: P<T>, options?: {
 }
 
 function opt<T>(parser: P<T>): P<Optional<T>> {
+    // @ts-ignore
     return new P<Optional<T>>( (input: string) => {
 
 
