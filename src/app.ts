@@ -15,9 +15,9 @@ const fs = require('fs');
 const readdir = promisify(fs.readdir);
 const stat = promisify(fs.stat);
 
-async function getFiles(dir) {
+async function getFiles(dir: any) {
     const subdirs = await readdir(dir);
-    const files = await Promise.all(subdirs.map(async (subdir) => {
+    const files = await Promise.all(subdirs.map(async (subdir: any) => {
         const res = resolve(dir, subdir);
         return (await stat(res)).isDirectory() ? getFiles(res) : res;
     }));
@@ -27,7 +27,7 @@ async function getFiles(dir) {
 getFiles(".").then(files => {
         const luminaFiles = files.filter(isLuminaFile)
 
-    luminaFiles.forEach(file => {
+    luminaFiles.forEach((file: any) => {
 
         const fileContent = fs.readFileSync(file,'utf8')
         const parseResult = compilationUnit().createParser(fileContent);
