@@ -13,7 +13,7 @@ namespace Ast {
     }
 
     export class Field {
-        constructor(public name: string, public ref: Ref, public init?: Expression) {
+        constructor(public name: string, public required: boolean, public ref: Ref, public init?: Expression) {
         }
     }
 

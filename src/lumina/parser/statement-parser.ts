@@ -49,22 +49,23 @@ function classParser(): P<ClassModel> {
                 str(")"),
             )
         ),
-        block()
-
+        opt(block())
     )
         .map(results => {
 
             const fields = results[1].get();
+            const statements = results[2].get()
 
-            return            new ClassModel(
-            results[0],
-            [],
-            fields === undefined ? [] : fields,
-            undefined,
-            [],
-            [],
-            results[2]
-        )})
+            return new ClassModel(
+                results[0],
+                [],
+                fields === undefined ? [] : fields,
+                undefined,
+                [],
+                [],
+                statements ? statements : []
+            )
+        })
 }
 
 function method(): P<Method> {
@@ -83,7 +84,7 @@ function method(): P<Method> {
         ),
         spaces(),
         block())
-        .map(result => new Method(result[0],[], result[1], [], result[2].get(), result[3])
+        .map(result => new Method(result[0], [], result[1], [], result[2].get(), result[3])
         )
 }
 
@@ -93,10 +94,12 @@ function field(): P<Field> {
         spaces(),
         identifier(),
         spaces(),
+        opt(capture(str("?"))),
+        spaces(),
         str(":"),
         spaces(),
         typeRef()
-    ).map(results => new Field(results[0], results[1]))
+    ).map(results => new Field(results[0],!results[1].isPresent(), results[2]))
 }
 
 function comment(): P<void> {
@@ -113,7 +116,18 @@ function comment(): P<void> {
 
 
 function typeRef(): P<Ref> {
-    return identifier().map(x => new RefLocal(x))
+    return seq(
+        identifier(),
+        opt(
+            seq(
+                spaces(),
+                str("["),
+                spaces(),
+                identifier(),
+                spaces(),
+                str("]"))
+        )
+    ).map(x => new RefLocal(x[0]))
 }
 
 function ifStatement(): P<If> {
@@ -163,11 +177,11 @@ function assign(): P<Assign> {
             str(":"),
             spaces(),
             typeRef(),
-    spaces()
-            )),
-            str("="),
-            statement()
-        ).map(results => new Assign(
+            spaces()
+        )),
+        str("="),
+        statement()
+    ).map(results => new Assign(
             results[0],
             results[1].get(),
             true,

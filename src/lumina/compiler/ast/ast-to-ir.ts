@@ -43,7 +43,7 @@ export namespace AstToIr {
     }
 
     function fieldToIr(field: Field, irState: IrState): Ir.Field {
-        return new Ir.Field(field.name, refToIr(field.ref, irState), field.init ? expressionToIr(field.init, irState) : undefined)
+        return new Ir.Field(field.name, field.required, refToIr(field.ref, irState), field.init ? expressionToIr(field.init, irState) : undefined)
     }
 
     function refToIr(ref: Ref, irState: IrState): Ir.Ref {

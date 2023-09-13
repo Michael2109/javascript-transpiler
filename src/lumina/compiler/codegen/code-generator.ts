@@ -18,11 +18,11 @@ export namespace CodeGenerator {
     }
 
     function classFieldToCode(field: Ir.Field): string {
-        return `public ${field.name}`
+        return `public ${field.name}` + (!field.required ? "?": "")
     }
 
     function fieldToCode(field: Ir.Field): string {
-        return field.name
+        return field.name + (!field.required ? "?": "")
     }
 
     /**
