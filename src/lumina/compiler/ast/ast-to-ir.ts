@@ -17,6 +17,9 @@ export namespace AstToIr {
     import Multiply = Ast.Multiply;
     import Divide = Ast.Divide;
     import Operator = Ast.Operator;
+    import Field = Ast.Field;
+    import RefLocal = Ast.RefLocal;
+    import Ref = Ast.Ref;
 
 
     interface IrState {
@@ -28,7 +31,7 @@ export namespace AstToIr {
     }
 
     function classModelToIr(classModel: ClassModel, irState: IrState): Ir.ClassModel {
-        return new Ir.ClassModel(classModel.name, classModel.statements.map(s => statementToIr(s,  { ...irState, isModule: false })))
+        return new Ir.ClassModel(classModel.name, classModel.fields.map(field => fieldToIr(field, irState)) ,classModel.statements.map(s => statementToIr(s,  { ...irState, isModule: false })))
     }
 
     function moduleMethodToIr(method: Method, irState: IrState): Ir.Method {
@@ -39,6 +42,18 @@ export namespace AstToIr {
         return new Ir.Method(method.name, method.statements.map(s => statementToIr(s, irState)))
     }
 
+    function fieldToIr(field: Field, irState: IrState): Ir.Field {
+        return new Ir.Field(field.name, refToIr(field.ref, irState), field.init ? expressionToIr(field.init, irState) : undefined)
+    }
+
+    function refToIr(ref: Ref, irState: IrState): Ir.Ref {
+        switch(ref.constructor){
+            case RefLocal:
+                return new Ir.RefLocal((ref as RefLocal).name)
+            default:
+                throw new Error("Ref not found: " + ref)
+        }
+    }
 
     function assignToIr(assign:Assign, irState: IrState): Ir.Assign {
         return new Ir.Assign(assign.name, assign.immutable,statementToIr(assign.statement, irState))

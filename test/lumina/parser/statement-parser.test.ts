@@ -46,7 +46,7 @@ test('Parse reassignment', () => {
 
 
 test('Parse field', () => {
-    assertSuccess(field().createParser("x: ClassName"),
+    assertSuccess(field().createParser("let x: ClassName"),
         new Field("x", new RefLocal("ClassName")),
         "")
 });
@@ -63,11 +63,23 @@ test('Parse class', () => {
             [],
             []
         ), "")
+
+    assertSuccess(classParser().createParser(
+            "class ClassName (let field1: Type, let field2: Type) {}"),
+        new ClassModel(
+            "ClassName",
+            [],
+            [  new Field("field1", new RefLocal("Type")),   new Field("field2", new RefLocal("Type"))],
+            undefined,
+            [],
+            [],
+            []
+        ), "")
 });
 
 test('Parse method', () => {
     assertSuccess(method().createParser("let methodName(){ }"), new Method("methodName", [], [], [], undefined, []), "")
-    assertSuccess(method().createParser("let methodName(x: Int, y: String){ }"), new Method("methodName", [], [new Field("x", new RefLocal("Int")), new Field("y", new RefLocal("String"))], [], undefined, []), "")
+    assertSuccess(method().createParser("let methodName(let x: Int, let y: String){ }"), new Method("methodName", [], [new Field("x", new RefLocal("Int")), new Field("y", new RefLocal("String"))], [], undefined, []), "")
     assertSuccess(method().createParser("let methodName(): ClassName{ }"), new Method("methodName", [], [], [], new RefLocal("ClassName"), []), "")
 });
 

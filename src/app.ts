@@ -34,6 +34,15 @@ function getFiles(basePath: string): string[] {
     return result;
 }
 
+function ensureDirectoryExistence(filePath: string) {
+    const dirname = path.dirname(filePath);
+    if (fs.existsSync(dirname)) {
+        return true;
+    }
+    ensureDirectoryExistence(dirname);
+    fs.mkdirSync(dirname);
+}
+
 function isLuminaFile(filePath: string): boolean {
     return filePath.endsWith(".lumina")
 }
@@ -55,9 +64,9 @@ console.log(luminaFiles)
         const newFileName  = file.substr(0, file.lastIndexOf(".")) + ".js"
 
         const outputPath = process.cwd() + "\\dist\\"+newFileName; // Resolve the relative path to an absolute path
+        ensureDirectoryExistence(outputPath)
         fs.writeFileSync(outputPath, code, 'utf8');
 
-       // fs.writeFileSync(outputPath, code)
     })
 
 

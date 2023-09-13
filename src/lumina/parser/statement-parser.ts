@@ -42,18 +42,29 @@ function classParser(): P<ClassModel> {
         spaces(),
         identifier(),
         spaces(),
+        opt(
+            seq(
+                str("("),
+                rep(field(), {sep: seq(spaces(), str(","), spaces())}),
+                str(")"),
+            )
+        ),
         block()
 
     )
-        .map(results => new ClassModel(
+        .map(results => {
+
+            const fields = results[1].get();
+
+            return            new ClassModel(
             results[0],
             [],
-            [],
+            fields === undefined ? [] : fields,
             undefined,
             [],
             [],
-            results[1]
-        ))
+            results[2]
+        )})
 }
 
 function method(): P<Method> {
@@ -78,6 +89,8 @@ function method(): P<Method> {
 
 function field(): P<Field> {
     return seq(
+        keyword("let"),
+        spaces(),
         identifier(),
         spaces(),
         str(":"),

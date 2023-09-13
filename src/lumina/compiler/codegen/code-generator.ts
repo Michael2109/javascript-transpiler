@@ -9,7 +9,20 @@ export namespace CodeGenerator {
     }
 
     function classToCode(classModel: Ir.ClassModel): string {
-        return `export class ${classModel.name} {` + classModel.statements.map(statementToCode) + "}"
+
+       const createConstructor = classModel.fields.length > 0
+
+       const constructor = "constructor(" + classModel.fields.map(classFieldToCode) + "){}"
+
+        return `export class ${classModel.name} {` + constructor + classModel.statements.map(statementToCode) + "}"
+    }
+
+    function classFieldToCode(field: Ir.Field): string {
+        return `public ${field.name}`
+    }
+
+    function fieldToCode(field: Ir.Field): string {
+        return field.name
     }
 
     /**

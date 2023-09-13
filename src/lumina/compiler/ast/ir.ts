@@ -10,7 +10,7 @@ namespace Ir {
     export class Statement {}
 
    export class ClassModel extends Statement{
-        constructor(public name: string, public statements: Array<Statement>) {
+        constructor(public name: string,    public fields: Field[],public statements: Array<Statement>) {
             super()
         }
     }
@@ -23,6 +23,19 @@ namespace Ir {
     export class Method extends Statement{
         constructor(public name: string, public statements: Array<Statement>) {
             super()
+        }
+    }
+
+    export class Field {
+        constructor(public name: string, public ref: Ref, public init?: Expression) {
+        }
+    }
+
+    export type Ref = RefLocal ;
+
+
+    export class RefLocal {
+        constructor(public name: string) {
         }
     }
 
