@@ -25,7 +25,7 @@ test('Parse string literal', () => {
 });
 
 test('Parse integer', () => {
-    assertSuccess(integer().createParser("123"), new IntConst(BigInt(123)), "")
+    assertSuccess(integer().createParser("123"), new IntConst(123), "")
     assertFail(integer().createParser(""))
 });
 

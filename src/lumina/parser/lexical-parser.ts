@@ -35,7 +35,7 @@ function stringLiteral(): P<string> {
 }
 
 function integer(): P<IntConst> {
-    return digit().map(result => new IntConst(BigInt(+result)))
+    return digit().map(result => new IntConst(+result))
 }
 
 function variable(): P<Variable> {

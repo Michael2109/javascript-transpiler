@@ -154,7 +154,7 @@ namespace Ast {
     }
 
     export class IntConst implements Expression {
-        constructor(public value: bigint) {
+        constructor(public value: number) {
         }
     }
 

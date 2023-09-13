@@ -8,47 +8,56 @@ import {Ast} from "./lumina/compiler/ast/ast";
 import CompilationUnit = Ast.CompilationUnit;
 import js_beautify from "js-beautify";
 
-console.log("Do something else")
 const { promisify } = require('util');
 const { resolve } = require('path');
-const fs = require('fs');
-const readdir = promisify(fs.readdir);
-const stat = promisify(fs.stat);
+import fs from 'fs';
+import path from 'path';
 
-async function getFiles(dir: any) {
-    const subdirs = await readdir(dir);
-    const files = await Promise.all(subdirs.map(async (subdir: any) => {
-        const res = resolve(dir, subdir);
-        return (await stat(res)).isDirectory() ? getFiles(res) : res;
-    }));
-    return files.reduce((a, f) => a.concat(f), []);
-}
+function getFiles(basePath: string): string[] {
+    const result: string[] = [];
 
-getFiles(".").then(files => {
-        const luminaFiles = files.filter(isLuminaFile)
+    function traverseDirectory(currentPath: string) {
+        const files = fs.readdirSync(currentPath);
 
-    luminaFiles.forEach((file: any) => {
+        for (const file of files) {
+            const filePath = path.join(currentPath, file);
 
-        const fileContent = fs.readFileSync(file,'utf8')
-        const parseResult = compilationUnit().createParser(fileContent);
-
-        console.log(JSON.stringify(parseResult))
-
-        const value: CompilationUnit = parseResult.value
-
-        console.log(JSON.stringify(AstToIr.compilationUnitToIr(value)))
-
-        const code = js_beautify.js_beautify(CodeGenerator.compilationUnitToCode(AstToIr.compilationUnitToIr(value)))
-
-        const newFileName  = file.substr(0, file.lastIndexOf(".")) + ".js";
-        console.log(newFileName)
-
-        fs.writeFileSync(newFileName, code)
-    })
-
+            if (fs.statSync(filePath).isDirectory()) {
+                traverseDirectory(filePath); // Recursively traverse directories
+            } else {
+                result.push(path.relative(basePath, filePath));
+            }
+        }
     }
-)
+
+    traverseDirectory(basePath);
+    return result;
+}
 
 function isLuminaFile(filePath: string): boolean {
     return filePath.endsWith(".lumina")
 }
+
+
+        const luminaFiles = getFiles("./src").filter(isLuminaFile)
+
+console.log(luminaFiles)
+
+    luminaFiles.forEach((file: any) => {
+
+        const fileContent = fs.readFileSync("./src/"+file,'utf8')
+        const parseResult = compilationUnit().createParser(fileContent);
+
+        const value: CompilationUnit = parseResult.value
+
+        const code = js_beautify.js_beautify(CodeGenerator.compilationUnitToCode(AstToIr.compilationUnitToIr(value)))
+
+        const newFileName  = file.substr(0, file.lastIndexOf(".")) + ".js"
+
+        const outputPath = process.cwd() + "\\dist\\"+newFileName; // Resolve the relative path to an absolute path
+        fs.writeFileSync(outputPath, code, 'utf8');
+
+       // fs.writeFileSync(outputPath, code)
+    })
+
+

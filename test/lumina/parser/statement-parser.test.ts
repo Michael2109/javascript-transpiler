@@ -26,21 +26,21 @@ test('Parse block', () => {
 });
 
 test('Parse if statement', () => {
-    assertSuccess(ifStatement().createParser("if(1){ }"), new If(new IntConst(BigInt(1)), [], undefined), "")
-    assertSuccess(ifStatement().createParser("if(1){ } else {}"), new If(new IntConst(BigInt(1)), [], []), "")
-    assertSuccess(ifStatement().createParser("if(1){ } else if(2) {} else {}"), new If(new IntConst(BigInt(1)),[], new If(new IntConst(BigInt(2)), [], [])), "")
+    assertSuccess(ifStatement().createParser("if(1){ }"), new If(new IntConst(1), [], undefined), "")
+    assertSuccess(ifStatement().createParser("if(1){ } else {}"), new If(new IntConst(1), [], []), "")
+    assertSuccess(ifStatement().createParser("if(1){ } else if(2) {} else {}"), new If(new IntConst(1),[], new If(new IntConst(2), [], [])), "")
 
 });
 
 test('Parse assignment', () => {
     assertSuccess(assign().createParser("let x = 10"),
-        new Assign("x",undefined, true, new ExprAsStmt(new IntConst(BigInt(10)))),
+        new Assign("x",undefined, true, new ExprAsStmt(new IntConst(10))),
         "")
 });
 
 test('Parse reassignment', () => {
     assertSuccess(reassign().createParser("x <- 10"),
-        new Reassign("x",new ExprAsStmt(new IntConst(BigInt(10)))),
+        new Reassign("x",new ExprAsStmt(new IntConst(10))),
         "")
 });
 

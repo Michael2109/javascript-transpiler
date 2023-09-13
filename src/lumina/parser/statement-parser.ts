@@ -1,6 +1,6 @@
 import {capture, cut, either, eitherMany, lazy, opt, P, regex, rep, seq, spaces, str} from "./parser";
 import {Ast} from "../compiler/ast/ast"
-import {expressionParser} from "./expression-parser";
+import {expressionParser, expressions} from "./expression-parser";
 import {identifier, keyword} from "./lexical-parser";
 import Statement = Ast.Statement;
 import ExprAsStmt = Ast.ExprAsStmt;
@@ -136,7 +136,7 @@ function block(): P<Array<Statement>> {
 
 function statement(): P<Statement> {
     return lazy(() =>
-        eitherMany<Statement>(classParser(), method(), expressionAsStatement())
+        eitherMany<Statement>(classParser(), method(), assign(), reassign(), expressionAsStatement())
     )
 }
 
@@ -179,7 +179,7 @@ function reassign(): P<Reassign> {
 
 
 function expressionAsStatement(): P<ExprAsStmt> {
-    return seq(spaces(), expressionParser(), spaces()).map(result => new ExprAsStmt(result))
+    return seq(spaces(), expressions(), spaces()).map(result => new ExprAsStmt(result))
 }
 
 export {compilationUnit, block, ifStatement, method, field, typeRef, comment, classParser, assign, reassign, statement}

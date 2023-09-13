@@ -18,21 +18,21 @@ test('Parse arithmetic', () => {
             new Add(),
             new ABinary(
                 new Subtract(),
-                new IntConst(BigInt(1)),
-                new IntConst(BigInt(2))),
-            new IntConst(BigInt(5))), "")
+                new IntConst(1),
+                new IntConst(2)),
+            new IntConst(5)), "")
 
     assertSuccess(expressions().createParser("1 - (2 + 5) * 3"),
         new ABinary(
             new Subtract(),
-            new IntConst(BigInt(1)),
+            new IntConst(1),
             new ABinary(
                 new Multiply(),
                 new ABinary(
                     new Add(),
-                    new IntConst(BigInt(2)),
-                    new IntConst(BigInt(5))),
-                new IntConst(BigInt(3)))
+                    new IntConst(2),
+                    new IntConst(5)),
+                new IntConst(3))
         ), "")
 });
 
@@ -47,20 +47,20 @@ test('Parse access modifier', () => {
 test('Parse method call', () => {
     assertSuccess(methodCall().createParser("example()"), new MethodCall("example", []), "")
     assertSuccess(methodCall().createParser("example(1)"),
-        new MethodCall("example", [new IntConst(BigInt(1))]), "")
+        new MethodCall("example", [new IntConst(1)]), "")
     assertSuccess(methodCall().createParser("example(1,2,3)"),
         new MethodCall("example",
-            [new IntConst(BigInt(1)), new IntConst(BigInt(2)), new IntConst(BigInt(3))]), "")
+            [new IntConst(1), new IntConst(2), new IntConst(3)]), "")
     assertSuccess(methodCall().createParser("example(1  ,  2  ,  3)"), new MethodCall("example",
-        [new IntConst(BigInt(1)), new IntConst(BigInt(2)), new IntConst(BigInt(3))]
+        [new IntConst(1), new IntConst(2), new IntConst(3)]
     ), "")
     assertSuccess(methodCall().createParser("example(  1  ,  2  ,  3  )"),
         new MethodCall("example",
-            [new IntConst(BigInt(1)), new IntConst(BigInt(2)), new IntConst(BigInt(3))]), "")
+            [new IntConst(1), new IntConst(2), new IntConst(3)]), "")
     assertFail(modifier().createParser(""))
 });
 
 test('Parse expressions', () => {
     assertSuccess(expressionParser().createParser("example()"), new MethodCall("example", []), "")
-    assertSuccess(expressionParser().createParser("1"), new IntConst(BigInt(1)), "")
+    assertSuccess(expressionParser().createParser("1"), new IntConst(1), "")
 });

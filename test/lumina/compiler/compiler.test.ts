@@ -19,11 +19,5 @@ test('Test parse and compile  to JavaScript', () => {
 
     const parseResult = compilationUnit().createParser(input);
 
-    console.log(JSON.stringify(parseResult))
-
     const value: CompilationUnit = parseResult.value
-
-    console.log(JSON.stringify(AstToIr.compilationUnitToIr(value)))
-
-    console.log(CodeGenerator.compilationUnitToCode(AstToIr.compilationUnitToIr(value)))
 });
