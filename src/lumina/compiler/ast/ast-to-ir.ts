@@ -18,8 +18,10 @@ export namespace AstToIr {
     import Divide = Ast.Divide;
     import Operator = Ast.Operator;
     import Field = Ast.Field;
-    import RefLocal = Ast.RefLocal;
-    import Ref = Ast.Ref;
+    import RefLocal = Ast.LocalType;
+    import Ref = Ast.Type;
+    import Type = Ast.Type;
+    import LocalType = Ast.LocalType;
 
 
     interface IrState {
@@ -30,8 +32,18 @@ export namespace AstToIr {
         return new Ir.CompilationUnit(compilationUnit.statements.map(s => statementToIr(s, {isModule: true})))
     }
 
-    function classModelToIr(classModel: ClassModel, irState: IrState): Ir.ClassModel {
-        return new Ir.ClassModel(classModel.name, classModel.fields.map(field => fieldToIr(field, irState)) ,classModel.statements.map(s => statementToIr(s,  { ...irState, isModule: false })))
+    function classToIr(classModel: ClassModel, irState: IrState): Ir.ClassModel {
+        return new Ir.ClassModel(classModel.name, classModel.parent ? typeToIr(classModel.parent, irState): undefined, classModel.fields.map(field => fieldToIr(field, irState)) ,classModel.statements.map(s => statementToIr(s,  { ...irState, isModule: false })))
+    }
+
+    function typeToIr(type: Type, irState: IrState): Ir.Type {
+        switch(type.constructor){
+            case LocalType:
+                return new Ir.LocalType((type as LocalType).name)
+            default:
+                throw new Error("Type not found: " + type)
+        }
+
     }
 
     function moduleMethodToIr(method: Method, irState: IrState): Ir.Method {
@@ -46,10 +58,10 @@ export namespace AstToIr {
         return new Ir.Field(field.name, field.required, refToIr(field.ref, irState), field.init ? expressionToIr(field.init, irState) : undefined)
     }
 
-    function refToIr(ref: Ref, irState: IrState): Ir.Ref {
+    function refToIr(ref: Ref, irState: IrState): Ir.Type {
         switch(ref.constructor){
             case RefLocal:
-                return new Ir.RefLocal((ref as RefLocal).name)
+                return new Ir.LocalType((ref as RefLocal).name)
             default:
                 throw new Error("Ref not found: " + ref)
         }
@@ -69,7 +81,7 @@ export namespace AstToIr {
 
          switch (statement.constructor){
             case ClassModel:
-                return   classModelToIr(statement as ClassModel, irState)
+                return   classToIr(statement as ClassModel, irState)
              case Method:
                  return  irState.isModule ?moduleMethodToIr(statement as Method, irState) : methodToIr(statement as Method, irState)
              case Assign:

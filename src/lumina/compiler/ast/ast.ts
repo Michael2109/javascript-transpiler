@@ -13,32 +13,17 @@ namespace Ast {
     }
 
     export class Field {
-        constructor(public name: string, public required: boolean, public ref: Ref, public init?: Expression) {
+        constructor(public name: string, public required: boolean, public ref: Type, public init?: Expression) {
         }
     }
 
-    export interface Type {
-        ref: Ref;
-    }
+    export class Type {}
 
-    export type Ref = RefSpecial | RefLocal | RefQual;
-
-    export class RefSpecial {
-        constructor(public specialRef: SpecialRef) {
-
-        }
-    }
-
-    export class RefLocal {
+    export class LocalType extends Type{
         constructor(public name: string) {
+            super();
         }
     }
-
-    export interface RefQual {
-        qualName: QualName;
-    }
-
-    export type SpecialRef = Super | This;
 
     export class Super {
     }
@@ -46,23 +31,8 @@ namespace Ast {
     export class This {
     }
 
-    export type TypeRel = Inherits | Extends | Equals;
-
-    export class Inherits {
-    }
-
-    export class Extends {
-    }
-
-    export class Equals {
-    }
-
     export interface NameSpace {
         nameSpace: string[];
-    }
-
-    export interface Name {
-        value: string;
     }
 
     export interface QualName {
@@ -71,7 +41,7 @@ namespace Ast {
     }
 
     export interface Annotation {
-        name: Name;
+        name: string;
     }
 
     export type Modifier = Public | Protected | Private | PackageLocal | Abstract | Open | Pure;
@@ -97,14 +67,7 @@ namespace Ast {
     export class Pure {
     }
 
-    export interface Block extends Statement {
-    }
-
     export interface Expression {
-    }
-
-    export interface Identifier extends Expression {
-        name: Name;
     }
 
     export class MethodCall implements Expression {
@@ -219,7 +182,7 @@ namespace Ast {
                     public annotations: Annotation[],
                     public fields: Field[],
                     public modifiers: Modifier[],
-                    public  returnType: Ref | undefined,
+                    public  returnType: Type | undefined,
                     public   statements: Array<Statement>) {
         }
 
@@ -238,7 +201,7 @@ namespace Ast {
 
     export class Assign implements Statement {
         constructor(public name: string,
-        public  type: Ref | undefined,
+        public  type: Type | undefined,
         public  immutable: boolean,
         public statement: Statement) {
         }
@@ -247,7 +210,7 @@ namespace Ast {
 
     export class Reassign implements Statement {
         constructor(public  name: string,
-        public  block: Block) {
+        public statement: Statement) {
         }
 
     }
@@ -255,24 +218,8 @@ namespace Ast {
     export class Return implements Statement {
     }
 
-    export class Lambda implements Statement {
-    }
-
     export class ExprAsStmt implements Statement {
         constructor(public expression: Expression) {
-        }
-    }
-
-    export class BlockStmt implements Statement {
-        constructor(public statements: Statement[]) {
-        }
-    }
-
-    export class Match implements Statement {
-    }
-
-    export class Case {
-        constructor(public expression: Expression, public block: Block) {
         }
     }
 

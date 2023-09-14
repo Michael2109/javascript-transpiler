@@ -5,7 +5,7 @@ import Variable = Ast.Variable;
 
 
 const KEYWORDS: Array<string> = Array(
-    "public", "protected", "private", "abstract", "open", "pure", "and", "del", "from", "not", "while",
+    "extends","public", "protected", "private", "abstract", "open", "pure", "and", "del", "from", "not", "while",
     "as", "elif", "global", "or", "with",
     "assert", "else", "if", "pass", "yield",
     "break", "except", "import",

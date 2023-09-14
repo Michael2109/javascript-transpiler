@@ -8,13 +8,14 @@ import Expression = Ast.Expression;
 import If = Ast.If;
 import Method = Ast.Method;
 import Field = Ast.Field;
-import Ref = Ast.Ref;
-import RefLocal = Ast.RefLocal;
+import Ref = Ast.Type;
+import RefLocal = Ast.LocalType;
 import ClassModel = Ast.ClassModel;
 import CompilationUnit = Ast.CompilationUnit;
 import Assign = Ast.Assign;
 import Reassign = Ast.Reassign;
 import Import = Ast.Import;
+import LocalType = Ast.LocalType;
 
 function compilationUnit(): P<CompilationUnit> {
     return rep(statement()).map(results => new CompilationUnit(
@@ -42,6 +43,13 @@ function classParser(): P<ClassModel> {
         spaces(),
         identifier(),
         spaces(),
+        opt(seq(
+                keyword("extends"),
+                spaces(),
+                identifier()
+            )
+        ),
+        spaces(),
         opt(
             seq(
                 str("("),
@@ -53,14 +61,15 @@ function classParser(): P<ClassModel> {
     )
         .map(results => {
 
-            const fields = results[1].get();
-            const statements = results[2].get()
+            const parent = results[1].get()
+            const fields = results[2].get();
+            const statements = results[3].get()
 
             return new ClassModel(
                 results[0],
                 [],
                 fields === undefined ? [] : fields,
-                undefined,
+                parent ? new LocalType(parent) : undefined,
                 [],
                 [],
                 statements ? statements : []
@@ -90,7 +99,7 @@ function method(): P<Method> {
 
 function field(): P<Field> {
     return seq(
-        keyword("let"),
+        opt(keyword("let")),
         spaces(),
         identifier(),
         spaces(),
@@ -99,7 +108,7 @@ function field(): P<Field> {
         str(":"),
         spaces(),
         typeRef()
-    ).map(results => new Field(results[0],!results[1].isPresent(), results[2]))
+    ).map(results => new Field(results[1], !results[2].isPresent(), results[3]))
 }
 
 function comment(): P<void> {

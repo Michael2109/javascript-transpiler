@@ -10,7 +10,7 @@ namespace Ir {
     export class Statement {}
 
    export class ClassModel extends Statement{
-        constructor(public name: string,    public fields: Field[],public statements: Array<Statement>) {
+        constructor(public name: string,  public parent: Type | undefined,  public fields: Field[],public statements: Array<Statement>) {
             super()
         }
     }
@@ -27,15 +27,16 @@ namespace Ir {
     }
 
     export class Field {
-        constructor(public name: string, public required: boolean, public ref: Ref, public init?: Expression) {
+        constructor(public name: string, public required: boolean, public ref: Type, public init?: Expression) {
         }
     }
 
-    export type Ref = RefLocal ;
 
+    export class Type {}
 
-    export class RefLocal {
+    export class LocalType extends Type{
         constructor(public name: string) {
+            super();
         }
     }
 

@@ -7,10 +7,10 @@
     "start": "npx tsc && node dist/app.js",
     "build": "tsc",
     "test": "npx tsc && jest",
-    "compile": "npx tsc && npm install -g . && compiler"
+    "compile": "npx tsc && npm install -g . && lumina"
   },
   "bin": {
-    "compiler": "dist/app.js"
+    "lumina": "dist/app.js"
   },
   "keywords": [],
   "author": "",

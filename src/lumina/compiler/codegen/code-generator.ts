@@ -4,6 +4,8 @@ import exp from "constants";
 export namespace CodeGenerator {
 
 
+    import LocalType = Ir.LocalType;
+
     export function compilationUnitToCode(compilationUnit: Ir.CompilationUnit): string {
         return compilationUnit.statements.map(statementToCode).join(" \n")
     }
@@ -12,9 +14,21 @@ export namespace CodeGenerator {
 
        const createConstructor = classModel.fields.length > 0
 
+        const parent = classModel.parent ? `extends ${typeToCode(classModel.parent)}` : ""
+
        const constructor = "constructor(" + classModel.fields.map(classFieldToCode) + "){}"
 
-        return `export class ${classModel.name} {` + constructor + classModel.statements.map(statementToCode) + "}"
+        return `export class ${classModel.name} ${parent} {` + constructor + classModel.statements.map(statementToCode) + "}"
+    }
+
+    function typeToCode(type: Ir.Type): string {
+        switch(type.constructor){
+            case LocalType:
+                return (type as LocalType).name
+            default:
+                throw new Error("Type not found:" + type)
+        }
+
     }
 
     function classFieldToCode(field: Ir.Field): string {

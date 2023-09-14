@@ -15,10 +15,11 @@ import If = Ast.If;
 import IntConst = Ast.IntConst;
 import Method = Ast.Method;
 import Field = Ast.Field;
-import RefLocal = Ast.RefLocal;
+import RefLocal = Ast.LocalType;
 import ClassModel = Ast.ClassModel;
 import Assign = Ast.Assign;
 import Reassign = Ast.Reassign;
+import LocalType = Ast.LocalType;
 
 test('Parse block', () => {
     assertSuccess(block().createParser("{ }"), [], "")
@@ -46,7 +47,10 @@ test('Parse reassignment', () => {
 
 
 test('Parse field', () => {
-    assertSuccess(field().createParser("let x: ClassName"),
+    assertSuccess(field().createParser("x: ClassName"),
+        new Field("x", true, new RefLocal("ClassName")),
+        "")
+   assertSuccess(field().createParser("let x: ClassName"),
         new Field("x", true, new RefLocal("ClassName")),
         "")
     assertSuccess(field().createParser("let x?: ClassName"),
@@ -75,6 +79,18 @@ test('Parse class', () => {
             [],
             [],
             undefined,
+            [],
+            [],
+            []
+        ), "")
+
+    assertSuccess(classParser().createParser(
+            "class ClassName extends Other"),
+        new ClassModel(
+            "ClassName",
+            [],
+            [],
+            new LocalType("Other"),
             [],
             [],
             []

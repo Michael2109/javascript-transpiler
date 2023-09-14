@@ -1,3 +1,33 @@
-class Import (let loc: Array[string])
+class Import (loc: Array[string])
 
-class Field (let name: string, let ref: Ref, let init?: Expression)
+class Field (name: string, ref: Ref, init?: Expression)
+
+class Type
+
+class LocalType extends Type (name: string)
+
+class Super
+
+class This
+
+class NameSpace (nameSpace: Array[string])
+
+class QualifiedName (value: string)
+
+class Annotation (name: string)
+
+class Modifier
+
+class Public extends Modifier
+class Protected extends Modifier
+class Private extends Modifier
+class PackageLocal extends Modifier
+class Abstract extends Modifier
+class Open extends Modifier
+class Pure extends Modifier
+
+class Expression
+class MethodCall (name: string, expressions: Array[Expression])
+class NewClassInstance (type: Type, expressions: Array<Expression>)
+
+class Statement
