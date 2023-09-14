@@ -43,26 +43,26 @@ function classParser(): P<ClassModel> {
         spaces(),
         identifier(),
         spaces(),
+        opt(
+            seq(
+                str("("),
+                rep(field(), {sep: seq(spaces(), str(","), spaces())}),
+                str(")"),
+                spaces()
+            )
+        ),
         opt(seq(
                 keyword("extends"),
                 spaces(),
                 identifier()
             )
         ),
-        spaces(),
-        opt(
-            seq(
-                str("("),
-                rep(field(), {sep: seq(spaces(), str(","), spaces())}),
-                str(")"),
-            )
-        ),
         opt(block())
     )
         .map(results => {
 
-            const parent = results[1].get()
-            const fields = results[2].get();
+            const fields = results[1].get();
+            const parent = results[2].get()
             const statements = results[3].get()
 
             return new ClassModel(

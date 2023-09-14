@@ -4,7 +4,7 @@ class Field (name: string, ref: Ref, init?: Expression)
 
 class Type
 
-class LocalType extends Type (name: string)
+class LocalType (name: string) extends Type
 
 class Super
 
@@ -28,6 +28,7 @@ class Pure extends Modifier
 
 class Expression
 class MethodCall (name: string, expressions: Array[Expression])
-class NewClassInstance (type: Type, expressions: Array<Expression>)
+class NewClassInstance (type: Type, expressions: Array[Expression])
+class StringLiteral (value: string)  extends Expression
 
 class Statement
