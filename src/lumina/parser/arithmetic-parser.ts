@@ -1,15 +1,15 @@
 import {digit, either, eitherMany, lazy, P, rep, seq, spaces, str} from "./parser";
-import {Ast} from "../compiler/ast/ast";
-import Expression = Ast.Expression;
-import Operator = Ast.Operator;
-import ABinary = Ast.ABinary;
-import Subtract = Ast.Subtract;
-import Add = Ast.Add;
-import Divide = Ast.Divide;
-import Multiply = Ast.Multiply;
-import ABinOp = Ast.ABinOp;
-import RBinOp = Ast.RBinOp;
-import RBinary = Ast.RBinary;
+import {ExpressionAst} from "../compiler/ast/expression-ast";
+import Expression = ExpressionAst.Expression;
+import Operator = ExpressionAst.Operator;
+import ABinary = ExpressionAst.ABinary;
+import Subtract = ExpressionAst.Subtract;
+import Add = ExpressionAst.Add;
+import Divide = ExpressionAst.Divide;
+import Multiply = ExpressionAst.Multiply;
+import ABinOp = ExpressionAst.ABinOp;
+import RBinOp = ExpressionAst.RBinOp;
+import RBinary = ExpressionAst.RBinary;
 import {expressionParser} from "./expression-parser";
 
 

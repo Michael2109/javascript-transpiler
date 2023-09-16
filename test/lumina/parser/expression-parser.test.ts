@@ -1,16 +1,16 @@
 import {assertFail, assertSuccess} from "./parser-test-utils";
 import {expressionParser, expressions, methodCall, modifier} from "../../../src/lumina/parser/expression-parser";
-import {Ast} from "../../../src/lumina/compiler/ast/ast";
-import Public = Ast.Public;
-import Protected = Ast.Protected;
-import IntConst = Ast.IntConst;
-import Private = Ast.Private;
-import Open = Ast.Open;
-import MethodCall = Ast.MethodCall;
-import ABinary = Ast.ABinary;
-import Add = Ast.Add;
-import Subtract = Ast.Subtract;
-import Multiply = Ast.Multiply;
+import {ExpressionAst} from "../../../src/lumina/compiler/ast/expression-ast";
+import Public = ExpressionAst.Public;
+import Protected = ExpressionAst.Protected;
+import IntConst = ExpressionAst.IntConst;
+import Private = ExpressionAst.Private;
+import Open = ExpressionAst.Open;
+import MethodCall = ExpressionAst.MethodCall;
+import ABinary = ExpressionAst.ABinary;
+import Add = ExpressionAst.Add;
+import Subtract = ExpressionAst.Subtract;
+import Multiply = ExpressionAst.Multiply;
 
 test('Parse arithmetic', () => {
     assertSuccess(expressions().createParser("1 - 2 + 5"),

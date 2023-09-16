@@ -1,7 +1,7 @@
 import {capture, charIn, charsWhileIn, cut, digit, either, P, rep, seq, str} from "./parser";
-import {Ast} from "../compiler/ast/ast";
-import IntConst = Ast.IntConst;
-import Variable = Ast.Variable;
+import {ExpressionAst} from "../compiler/ast/expression-ast";
+import IntConst = ExpressionAst.IntConst;
+import Variable = ExpressionAst.Variable;
 
 
 const KEYWORDS: Array<string> = Array(

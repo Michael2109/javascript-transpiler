@@ -1,23 +1,23 @@
 import {capture, cut, either, eitherMany, lazy, P, rep, seq, spaces, str} from "./parser";
-import {Ast} from "../compiler/ast/ast"
+import {ExpressionAst} from "../compiler/ast/expression-ast"
 import {identifier, integer, keyword, variable} from "./lexical-parser";
-import Modifier = Ast.Modifier;
-import Public = Ast.Public;
-import Protected = Ast.Protected;
-import MethodCall = Ast.MethodCall;
-import Expression = Ast.Expression;
-import Private = Ast.Private;
-import Abstract = Ast.Abstract;
-import Open = Ast.Open;
-import Subtract = Ast.Subtract;
-import Add = Ast.Add;
-import Divide = Ast.Divide;
-import Multiply = Ast.Multiply;
-import ABinOp = Ast.ABinOp;
-import ABinary = Ast.ABinary;
-import RBinOp = Ast.RBinOp;
-import RBinary = Ast.RBinary;
-import Operator = Ast.Operator;
+import Modifier = ExpressionAst.Modifier;
+import Public = ExpressionAst.Public;
+import Protected = ExpressionAst.Protected;
+import MethodCall = ExpressionAst.MethodCall;
+import Expression = ExpressionAst.Expression;
+import Private = ExpressionAst.Private;
+import Abstract = ExpressionAst.Abstract;
+import Open = ExpressionAst.Open;
+import Subtract = ExpressionAst.Subtract;
+import Add = ExpressionAst.Add;
+import Divide = ExpressionAst.Divide;
+import Multiply = ExpressionAst.Multiply;
+import ABinOp = ExpressionAst.ABinOp;
+import ABinary = ExpressionAst.ABinary;
+import RBinOp = ExpressionAst.RBinOp;
+import RBinary = ExpressionAst.RBinary;
+import Operator = ExpressionAst.Operator;
 
 function expressions(): P<Expression> {
     return addSubtract();

@@ -1,11 +1,10 @@
 #!/usr/bin/env node
 
 import {compilationUnit} from "./lumina/parser/statement-parser";
-import {AstToIr} from "./lumina/compiler/ast/ast-to-ir";
-import {CodeGenerator} from "./lumina/compiler/codegen/code-generator";
-import {Ir} from "./lumina/compiler/ast/ir";
-import {Ast} from "./lumina/compiler/ast/ast";
-import CompilationUnit = Ast.CompilationUnit;
+import {AstToIr} from "./lumina/compiler/asttoir/ast-to-ir";
+import {CodeGenerator} from "./lumina/compiler/codegen/statement-to-code";
+import {StatementAst} from "./lumina/compiler/ast/statement-ast";
+import CompilationUnit = StatementAst.CompilationUnit;
 import js_beautify from "js-beautify";
 
 const { promisify } = require('util');

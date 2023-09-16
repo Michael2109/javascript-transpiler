@@ -1,21 +1,5 @@
-namespace Ast {
-    export class CompilationUnit {
-        constructor(   public nameSpace: NameSpace,
-        public imports: Import[],
-        public statements: Model[]) {
-        }
+namespace ExpressionAst {
 
-    }
-
-    export class Import {
-        constructor(public loc: string[]) {
-        }
-    }
-
-    export class Field {
-        constructor(public name: string, public required: boolean, public ref: Type, public init?: Expression) {
-        }
-    }
 
     export class Type {}
 
@@ -76,7 +60,7 @@ namespace Ast {
     }
 
     export class NewClassInstance implements Expression {
-        constructor(public type: Type, public expression: Expression[], public anonymousClass: Statement | null) {
+        constructor(public type: Type, public expression: Expression[]) {
         }
     }
 
@@ -121,11 +105,6 @@ namespace Ast {
         }
     }
 
-    export class IntObject implements Expression {
-        constructor(public value: Statement) {
-        }
-    }
-
     export class LongConst implements Expression {
         constructor(public value: bigint) {
         }
@@ -156,73 +135,6 @@ namespace Ast {
 
     export class SpecialRefAsExpr implements Expression {
     }
-
-    export interface Model extends Statement {
-    }
-
-    export interface Statement {
-    }
-
-    export class ClassModel implements Model {
-        constructor(
-          public  name: string,
-        public modifiers: Modifier[],
-        public fields: Field[],
-        public parent: Type | undefined,
-        public  parentArguments: Expression[],
-        public  interfaces: Type[],
-        public  statements: Statement[]
-        ) {
-        }
-
-    }
-
-    export class Method implements Statement {
-        constructor(public  name: string,
-                    public annotations: Annotation[],
-                    public fields: Field[],
-                    public modifiers: Modifier[],
-                    public  returnType: Type | undefined,
-                    public   statements: Array<Statement>) {
-        }
-
-    }
-
-    export class For implements Statement {
-    }
-
-    export class While implements Statement {
-    }
-
-    export class If implements Statement {
-        constructor(public condition: Expression, public ifBlock: Statement, public elseBlock?: Statement) {
-        }
-    }
-
-    export class Assign implements Statement {
-        constructor(public name: string,
-        public  type: Type | undefined,
-        public  immutable: boolean,
-        public statement: Statement) {
-        }
-
-    }
-
-    export class Reassign implements Statement {
-        constructor(public  name: string,
-        public statement: Statement) {
-        }
-
-    }
-
-    export class Return implements Statement {
-    }
-
-    export class ExprAsStmt implements Statement {
-        constructor(public expression: Expression) {
-        }
-    }
-
     export abstract class Operator {
     }
 
@@ -258,4 +170,4 @@ namespace Ast {
     export class Equal extends RBinOp {}
 }
 
-export {Ast}
+export {ExpressionAst}

@@ -1,4 +1,6 @@
-import {Ast} from "../../../src/lumina/compiler/ast/ast";
+import {ExpressionAst} from "../../../src/lumina/compiler/ast/expression-ast";
+import {StatementAst} from "../../../src/lumina/compiler/ast/statement-ast";
+
 import {assertSuccess} from "./parser-test-utils";
 import {
     assign,
@@ -9,17 +11,17 @@ import {
     ifStatement,
     method, reassign, statement
 } from "../../../src/lumina/parser/statement-parser";
-import ExprAsStmt = Ast.ExprAsStmt;
-import Variable = Ast.Variable;
-import If = Ast.If;
-import IntConst = Ast.IntConst;
-import Method = Ast.Method;
-import Field = Ast.Field;
-import RefLocal = Ast.LocalType;
-import ClassModel = Ast.ClassModel;
-import Assign = Ast.Assign;
-import Reassign = Ast.Reassign;
-import LocalType = Ast.LocalType;
+import ExprAsStmt = StatementAst.ExprAsStmt;
+import Variable = ExpressionAst.Variable;
+import If = StatementAst.If;
+import IntConst = ExpressionAst.IntConst;
+import Method = StatementAst.Method;
+import Field = StatementAst.Field;
+import RefLocal = ExpressionAst.LocalType;
+import ClassModel = StatementAst.ClassModel;
+import Assign = StatementAst.Assign;
+import Reassign = StatementAst.Reassign;
+import LocalType = ExpressionAst.LocalType;
 
 test('Parse block', () => {
     assertSuccess(block().createParser("{ }"), [], "")

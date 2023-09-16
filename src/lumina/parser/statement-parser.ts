@@ -1,21 +1,25 @@
 import {capture, cut, either, eitherMany, lazy, opt, P, regex, rep, seq, spaces, str} from "./parser";
-import {Ast} from "../compiler/ast/ast"
+import {ExpressionAst} from "../compiler/ast/expression-ast"
 import {expressionParser, expressions} from "./expression-parser";
 import {identifier, keyword} from "./lexical-parser";
-import Statement = Ast.Statement;
-import ExprAsStmt = Ast.ExprAsStmt;
-import Expression = Ast.Expression;
-import If = Ast.If;
-import Method = Ast.Method;
-import Field = Ast.Field;
-import Ref = Ast.Type;
-import RefLocal = Ast.LocalType;
-import ClassModel = Ast.ClassModel;
-import CompilationUnit = Ast.CompilationUnit;
-import Assign = Ast.Assign;
-import Reassign = Ast.Reassign;
-import Import = Ast.Import;
-import LocalType = Ast.LocalType;
+
+import {StatementAst} from "../compiler/ast/statement-ast";
+
+import Expression = ExpressionAst.Expression;
+import Ref = ExpressionAst.Type;
+import RefLocal = ExpressionAst.LocalType;
+
+import If = StatementAst.If;
+import Method = StatementAst.Method;
+import Field = StatementAst.Field;
+import Statement = StatementAst.Statement;
+import ExprAsStmt = StatementAst.ExprAsStmt;
+import ClassModel = StatementAst.ClassModel;
+import CompilationUnit = StatementAst.CompilationUnit;
+import Assign = StatementAst.Assign;
+import Reassign = StatementAst.Reassign;
+import Import = StatementAst.Import;
+import LocalType = ExpressionAst.LocalType;
 
 function compilationUnit(): P<CompilationUnit> {
     return rep(statement()).map(results => new CompilationUnit(

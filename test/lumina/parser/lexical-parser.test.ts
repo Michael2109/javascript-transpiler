@@ -1,8 +1,8 @@
 import {identifier, integer, keyword, stringLiteral, variable} from "../../../src/lumina/parser/lexical-parser";
 import {assertFail, assertSuccess} from "./parser-test-utils";
-import {Ast} from "../../../src/lumina/compiler/ast/ast";
-import IntConst = Ast.IntConst;
-import Variable = Ast.Variable;
+import {ExpressionAst} from "../../../src/lumina/compiler/ast/expression-ast";
+import IntConst = ExpressionAst.IntConst;
+import Variable = ExpressionAst.Variable;
 
 test('Parse keywords', () => {
     assertSuccess(keyword("public").createParser("public"), undefined, "")

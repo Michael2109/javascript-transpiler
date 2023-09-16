@@ -30,5 +30,3 @@ class Expression
 class MethodCall (name: string, expressions: Array[Expression])
 class NewClassInstance (type: Type, expressions: Array[Expression])
 class StringLiteral (value: string)  extends Expression
-
-class Statement
