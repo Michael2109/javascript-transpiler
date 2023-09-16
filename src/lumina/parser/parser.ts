@@ -1,4 +1,3 @@
-import {variable} from "./lexical-parser";
 import {Optional} from "./optional";
 
 const DIGIT_REGEX: RegExp = new RegExp(`^[0-9]+`);
@@ -8,8 +7,8 @@ type Parser<T> = (input: string) => ParseResult<T>
 class P<T> {
     public readonly createParser: Parser<T>;
 
-    constructor(parserFn:  Parser<T> ) {
-            this.createParser = parserFn;
+    constructor(parserFn: Parser<T>) {
+        this.createParser = parserFn;
     }
 
     map<U>(transform: (value: T) => U): P<U> {
@@ -35,7 +34,7 @@ class P<T> {
 
         const t = this;
 
-        return new P<T>( (input: string) => {
+        return new P<T>((input: string) => {
             const parseResult: ParseResult<T> = t.createParser(input);
             const success: boolean = applyFilter(parseResult.value);
             return {success: success, value: parseResult.value, remaining: parseResult.remaining};
@@ -51,7 +50,7 @@ interface ParseResult<T> {
     disallowBacktrack?: boolean
 }
 
-type ElementTypeIfLengthOneOrZero<T extends any[]> = T['length'] extends 1 ? T[0] : ( T['length'] extends 0 ? void :T);
+type ElementTypeIfLengthOneOrZero<T extends any[]> = T['length'] extends 1 ? T[0] : (T['length'] extends 0 ? void : T);
 
 type FilterOutVoid<T extends any[]> = T extends [infer Head, ...infer Rest]
     ? Head extends void
@@ -93,7 +92,7 @@ function seq<T extends any[]>(...parsers: { [K in keyof T]: P<ElementTypeIfLengt
 }
 
 function lazy<T>(fn: () => P<T>): P<T> {
-    return new P<T>( (input: string) => {
+    return new P<T>((input: string) => {
         return fn().createParser(input)
     })
 }
@@ -134,7 +133,7 @@ function charsWhileIn(chars: string): P<string> {
 }
 
 function spaces(): P<void> {
-    return new P<void>( (input: string) => {
+    return new P<void>((input: string) => {
 
         return charsWhileIn(" \r\n\t").map(() => {
         }).createParser(input)
@@ -143,7 +142,7 @@ function spaces(): P<void> {
 
 function capture(parser: P<void>): P<string> {
     // @ts-ignore
-    return new P<string>( (input: string) => {
+    return new P<string>((input: string) => {
         const parseResult = parser.createParser(input)
 
         if (parseResult.success) {
@@ -156,7 +155,7 @@ function capture(parser: P<void>): P<string> {
 
 function str(expected: string): P<void> {
 
-    return new P<void>( (input: string) => {
+    return new P<void>((input: string) => {
 
         if (input.startsWith(expected)) {
             return {
@@ -172,7 +171,7 @@ function str(expected: string): P<void> {
 
 function regex(expected: RegExp): P<void> {
 
-    return new P<void>( (input: string) => {
+    return new P<void>((input: string) => {
 
         const match = input.match(expected);
 
@@ -190,7 +189,7 @@ function digit(): P<string> {
 }
 
 function end(): P<void> {
-    return new P<void>( (input: string) => {
+    return new P<void>((input: string) => {
         if (input === "") {
             return {success: true, value: undefined, remaining: input};
         }
@@ -200,7 +199,7 @@ function end(): P<void> {
 
 function either<T, U>(parserA: P<T>, parserB: P<U>): P<T | U> {
 // @ts-ignore
-    return new P<T | U>( (input: string) => {
+    return new P<T | U>((input: string) => {
 
         const result = parserA.createParser(input);
         if (result.success) {
@@ -216,7 +215,7 @@ function either<T, U>(parserA: P<T>, parserB: P<U>): P<T | U> {
 
 function eitherMany<T>(...parsers: Array<P<T>>): P<T> {
 // @ts-ignore
-    return new P<T>( (input: string) => {
+    return new P<T>((input: string) => {
 
         for (let parser of parsers) {
             const parseResult = parser.createParser(input)
@@ -231,7 +230,7 @@ function eitherMany<T>(...parsers: Array<P<T>>): P<T> {
 }
 
 function cut<T>(parser: P<T>): P<T> {
-    return new P<T>( (input: string) => {
+    return new P<T>((input: string) => {
         const result = parser.createParser(input);
         if (result.success) {
             return result;
@@ -248,7 +247,7 @@ function rep<T>(parser: P<T>, options?: {
     sep?: P<unknown>
 }): P<Array<T>> {
 
-    return new P<Array<T>>( (input: string) => {
+    return new P<Array<T>>((input: string) => {
 
         const results: Array<T> = []
         let remainingInput = input;
@@ -281,7 +280,7 @@ function rep<T>(parser: P<T>, options?: {
 
 function opt<T>(parser: P<T>): P<Optional<T>> {
     // @ts-ignore
-    return new P<Optional<T>>( (input: string) => {
+    return new P<Optional<T>>((input: string) => {
 
 
         const parseResult = parser.createParser(input);
@@ -294,7 +293,7 @@ function opt<T>(parser: P<T>): P<Optional<T>> {
 }
 
 function index<T>(parser: Parser<T>): P<T> {
-    return new P<T>( (input: string) => {
+    return new P<T>((input: string) => {
         const result = parser(input);
         if (result.success) {
             return result;

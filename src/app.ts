@@ -3,14 +3,15 @@
 import {compilationUnit} from "./lumina/parser/statement-parser";
 import {AstToIr} from "./lumina/compiler/asttoir/ast-to-ir";
 import {CodeGenerator} from "./lumina/compiler/codegen/statement-to-code";
+import {DeclarationsAst} from "./lumina/compiler/ast/declarations-ast";
 import {StatementAst} from "./lumina/compiler/ast/statement-ast";
-import CompilationUnit = StatementAst.CompilationUnit;
 import js_beautify from "js-beautify";
-
-const { promisify } = require('util');
-const { resolve } = require('path');
 import fs from 'fs';
 import path from 'path';
+import CompilationUnit = DeclarationsAst.CompilationUnit;
+
+const {promisify} = require('util');
+const {resolve} = require('path');
 
 function getFiles(basePath: string): string[] {
     const result: string[] = [];
@@ -47,25 +48,25 @@ function isLuminaFile(filePath: string): boolean {
 }
 
 
-        const luminaFiles = getFiles("./src").filter(isLuminaFile)
+const luminaFiles = getFiles("./src").filter(isLuminaFile)
 
 console.log(luminaFiles)
 
-    luminaFiles.forEach((file: any) => {
+luminaFiles.forEach((file: any) => {
 
-        const fileContent = fs.readFileSync("./src/"+file,'utf8')
-        const parseResult = compilationUnit().createParser(fileContent);
+    const fileContent = fs.readFileSync("./src/" + file, 'utf8')
+    const parseResult = compilationUnit().createParser(fileContent);
 
-        const value: CompilationUnit = parseResult.value
+    const value: CompilationUnit = parseResult.value
 
-        const code = js_beautify.js_beautify(CodeGenerator.compilationUnitToCode(AstToIr.compilationUnitToIr(value)))
+    const code = js_beautify.js_beautify(CodeGenerator.compilationUnitToCode(AstToIr.compilationUnitToIr(value)))
 
-        const newFileName  = file.substr(0, file.lastIndexOf(".")) + ".js"
+    const newFileName = file.substr(0, file.lastIndexOf(".")) + ".js"
 
-        const outputPath = process.cwd() + "\\dist\\"+newFileName; // Resolve the relative path to an absolute path
-        ensureDirectoryExistence(outputPath)
-        fs.writeFileSync(outputPath, code, 'utf8');
+    const outputPath = process.cwd() + "\\dist\\" + newFileName; // Resolve the relative path to an absolute path
+    ensureDirectoryExistence(outputPath)
+    fs.writeFileSync(outputPath, code, 'utf8');
 
-    })
+})
 
 

@@ -3,9 +3,9 @@ import {ExpressionIr} from "../ir/expression-ir";
 namespace ExpressionToCode {
 
     export function expressionToCode(expression: ExpressionIr.Expression): string {
-        switch (expression.constructor){
+        switch (expression.constructor) {
             case ExpressionIr.IntConst:
-                return   intConstToCode(expression as ExpressionIr.IntConst)
+                return intConstToCode(expression as ExpressionIr.IntConst)
             case ExpressionIr.ABinary:
                 return aBinaryToCode(expression as ExpressionIr.ABinary)
             default:
@@ -13,12 +13,12 @@ namespace ExpressionToCode {
         }
     }
 
-    export  function aBinaryToCode(aBinary: ExpressionIr.ABinary): string {
+    export function aBinaryToCode(aBinary: ExpressionIr.ABinary): string {
         return expressionToCode(aBinary.expression1) + opToCode(aBinary.op) + expressionToCode(aBinary.expression2)
     }
 
-    export function opToCode(operator:ExpressionIr.Operator): string {
-        switch (operator.constructor){
+    export function opToCode(operator: ExpressionIr.Operator): string {
+        switch (operator.constructor) {
             case ExpressionIr.Add:
                 return "+"
             case ExpressionIr.Subtract:

@@ -2,14 +2,15 @@ import {ExpressionAst} from "../ast/expression-ast";
 import {StatementAst} from "../ast/statement-ast";
 import {ExpressionIr} from "../ir/expression-ir";
 import {StatementIr} from "../ir/statement-ir";
+import {DeclarationsAst} from "../ast/declarations-ast";
 
 export namespace AstToIr {
 
-    import ClassModel = StatementAst.ClassModel;
+    import ClassModel = DeclarationsAst.ClassModel;
     import Statement = StatementAst.Statement;
-    import Method = StatementAst.Method;
-    import CompilationUnit = StatementAst.CompilationUnit;
-    import Assign = StatementAst.Assign;
+    import Method = DeclarationsAst.Method;
+    import CompilationUnit = DeclarationsAst.CompilationUnit;
+    import Assign = DeclarationsAst.Assign;
     import IntConst = ExpressionAst.IntConst;
     import ExprAsStmt = StatementAst.ExprAsStmt;
     import Expression = ExpressionAst.Expression;
@@ -19,7 +20,7 @@ export namespace AstToIr {
     import Multiply = ExpressionAst.Multiply;
     import Divide = ExpressionAst.Divide;
     import Operator = ExpressionAst.Operator;
-    import Field = StatementAst.Field;
+    import Field = DeclarationsAst.Field;
     import RefLocal = ExpressionAst.LocalType;
     import Ref = ExpressionAst.Type;
     import Type = ExpressionAst.Type;
@@ -35,11 +36,14 @@ export namespace AstToIr {
     }
 
     function classToIr(classModel: ClassModel, irState: IrState): StatementIr.ClassModel {
-        return new StatementIr.ClassModel(classModel.name, classModel.parent ? typeToIr(classModel.parent, irState): undefined, classModel.fields.map(field => fieldToIr(field, irState)) ,classModel.statements.map(s => statementToIr(s,  { ...irState, isModule: false })))
+        return new StatementIr.ClassModel(classModel.name, classModel.parent ? typeToIr(classModel.parent, irState) : undefined, classModel.fields.map(field => fieldToIr(field, irState)), classModel.statements.map(s => statementToIr(s, {
+            ...irState,
+            isModule: false
+        })))
     }
 
     function typeToIr(type: Type, irState: IrState): StatementIr.Type {
-        switch(type.constructor){
+        switch (type.constructor) {
             case LocalType:
                 return new StatementIr.LocalType((type as LocalType).name)
             default:
@@ -61,7 +65,7 @@ export namespace AstToIr {
     }
 
     function refToIr(ref: Ref, irState: IrState): StatementIr.Type {
-        switch(ref.constructor){
+        switch (ref.constructor) {
             case RefLocal:
                 return new StatementIr.LocalType((ref as RefLocal).name)
             default:
@@ -69,8 +73,8 @@ export namespace AstToIr {
         }
     }
 
-    function assignToIr(assign:Assign, irState: IrState): StatementIr.Assign {
-        return new StatementIr.Assign(assign.name, assign.immutable,statementToIr(assign.statement, irState))
+    function assignToIr(assign: Assign, irState: IrState): StatementIr.Assign {
+        return new StatementIr.Assign(assign.name, assign.immutable, statementToIr(assign.statement, irState))
     }
 
     function exprAsStmtToIr(exprAsStmt: ExprAsStmt, irState: IrState): StatementIr.ExprAsStmt {
@@ -78,20 +82,19 @@ export namespace AstToIr {
     }
 
 
-
     function statementToIr(statement: Statement, irState: IrState): StatementIr.Statement {
 
-         switch (statement.constructor){
+        switch (statement.constructor) {
             case ClassModel:
-                return   classToIr(statement as ClassModel, irState)
-             case Method:
-                 return  irState.isModule ?moduleMethodToIr(statement as Method, irState) : methodToIr(statement as Method, irState)
-             case Assign:
-                 return assignToIr(statement as Assign, irState)
-             case ExprAsStmt:
-                 return exprAsStmtToIr(statement as ExprAsStmt, irState)
-             default:
-                 throw new Error("Unknown statement: " + JSON.stringify(statement))
+                return classToIr(statement as ClassModel, irState)
+            case Method:
+                return irState.isModule ? moduleMethodToIr(statement as Method, irState) : methodToIr(statement as Method, irState)
+            case Assign:
+                return assignToIr(statement as Assign, irState)
+            case ExprAsStmt:
+                return exprAsStmtToIr(statement as ExprAsStmt, irState)
+            default:
+                throw new Error("Unknown statement: " + JSON.stringify(statement))
         }
     }
 
@@ -100,9 +103,9 @@ export namespace AstToIr {
      */
     function expressionToIr(expression: Expression, irState: IrState): ExpressionIr.Expression {
 
-        switch (expression.constructor){
+        switch (expression.constructor) {
             case IntConst:
-                return   intConstToIr(expression as IntConst, irState)
+                return intConstToIr(expression as IntConst, irState)
             case ABinary:
                 return aBinaryToIr(expression as ABinary, irState)
             default:
@@ -118,8 +121,8 @@ export namespace AstToIr {
         return new ExpressionIr.ABinary(opToIr(aBinary.op, irState), expressionToIr(aBinary.expression1, irState), expressionToIr(aBinary.expression2, irState))
     }
 
-    function opToIr(operator:Operator, irState: IrState): ExpressionIr.Operator {
-        switch (operator.constructor){
+    function opToIr(operator: Operator, irState: IrState): ExpressionIr.Operator {
+        switch (operator.constructor) {
             case Add:
                 return new ExpressionIr.Add()
             case Subtract:

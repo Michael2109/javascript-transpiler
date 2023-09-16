@@ -1,5 +1,4 @@
-import { ExpressionIr} from "../ir/expression-ir";
-import { StatementIr} from "../ir/statement-ir";
+import {StatementIr} from "../ir/statement-ir";
 import {ExpressionToCode} from "./expression-to-code";
 
 export namespace CodeGenerator {
@@ -13,17 +12,17 @@ export namespace CodeGenerator {
 
     function classToCode(classModel: StatementIr.ClassModel): string {
 
-       const createConstructor = classModel.fields.length > 0
+        const createConstructor = classModel.fields.length > 0
 
         const parent = classModel.parent ? `extends ${typeToCode(classModel.parent)}` : ""
 
-       const constructor = "constructor(" + classModel.fields.map(classFieldToCode) + "){}"
+        const constructor = "constructor(" + classModel.fields.map(classFieldToCode) + "){}"
 
         return `export class ${classModel.name} ${parent} {` + constructor + classModel.statements.map(statementToCode) + "}"
     }
 
     function typeToCode(type: StatementIr.Type): string {
-        switch(type.constructor){
+        switch (type.constructor) {
             case LocalType:
                 return (type as LocalType).name
             default:
@@ -33,11 +32,11 @@ export namespace CodeGenerator {
     }
 
     function classFieldToCode(field: StatementIr.Field): string {
-        return `public ${field.name}` + (!field.required ? "?": "")
+        return `public ${field.name}` + (!field.required ? "?" : "")
     }
 
     function fieldToCode(field: StatementIr.Field): string {
-        return field.name + (!field.required ? "?": "")
+        return field.name + (!field.required ? "?" : "")
     }
 
     /**
@@ -62,15 +61,15 @@ export namespace CodeGenerator {
     }
 
     function statementToCode(statement: StatementIr.Statement): string {
-        switch (statement.constructor){
+        switch (statement.constructor) {
             case StatementIr.ClassModel:
-                return   classToCode(statement as StatementIr.ClassModel)
+                return classToCode(statement as StatementIr.ClassModel)
             case StatementIr.ModuleMethod:
                 return moduleMethodToCode(statement as StatementIr.ModuleMethod)
             case StatementIr.Method:
-                return  methodToCode(statement as StatementIr.Method)
+                return methodToCode(statement as StatementIr.Method)
             case StatementIr.Assign:
-                return  assignToCode(statement as StatementIr.Assign)
+                return assignToCode(statement as StatementIr.Assign)
             case StatementIr.ExprAsStmt:
                 return exprAsStmtToCode(statement as StatementIr.ExprAsStmt)
             default:

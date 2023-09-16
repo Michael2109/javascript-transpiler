@@ -3,22 +3,24 @@ import {ExpressionAst} from "../compiler/ast/expression-ast"
 import {expressionParser, expressions} from "./expression-parser";
 import {identifier, keyword} from "./lexical-parser";
 
+import {DeclarationsAst} from "../compiler/ast/declarations-ast";
 import {StatementAst} from "../compiler/ast/statement-ast";
+import {ControlFlowAst} from "../compiler/ast/control-flow-ast";
 
 import Expression = ExpressionAst.Expression;
 import Ref = ExpressionAst.Type;
 import RefLocal = ExpressionAst.LocalType;
 
-import If = StatementAst.If;
-import Method = StatementAst.Method;
-import Field = StatementAst.Field;
+import If = ControlFlowAst.If;
+import Method = DeclarationsAst.Method;
+import Field = DeclarationsAst.Field;
 import Statement = StatementAst.Statement;
 import ExprAsStmt = StatementAst.ExprAsStmt;
-import ClassModel = StatementAst.ClassModel;
-import CompilationUnit = StatementAst.CompilationUnit;
-import Assign = StatementAst.Assign;
-import Reassign = StatementAst.Reassign;
-import Import = StatementAst.Import;
+import ClassModel = DeclarationsAst.ClassModel;
+import CompilationUnit = DeclarationsAst.CompilationUnit;
+import Assign = DeclarationsAst.Assign;
+import Reassign = DeclarationsAst.Reassign;
+import Import = DeclarationsAst.Import;
 import LocalType = ExpressionAst.LocalType;
 
 function compilationUnit(): P<CompilationUnit> {

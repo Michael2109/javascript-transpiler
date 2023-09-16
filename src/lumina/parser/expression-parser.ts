@@ -78,9 +78,9 @@ function chain(parser1: P<Expression>, operatorParser1: P<Operator>, operatorPar
                     const expression = r === undefined ? lhs : r;
                     const operator = rhsResults[0]
 
-                    if(operator instanceof ABinOp){
+                    if (operator instanceof ABinOp) {
                         r = new ABinary(operator, expression, rhsResults[1])
-                    }else if(operator instanceof RBinOp){
+                    } else if (operator instanceof RBinOp) {
                         r = new RBinary(operator, expression, rhsResults[1])
                     } else {
                         throw new Error("Unknown operator: " + operator)

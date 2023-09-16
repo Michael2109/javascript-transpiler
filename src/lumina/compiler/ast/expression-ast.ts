@@ -1,9 +1,10 @@
 namespace ExpressionAst {
 
 
-    export class Type {}
+    export class Type {
+    }
 
-    export class LocalType extends Type{
+    export class LocalType extends Type {
         constructor(public name: string) {
             super();
         }
@@ -55,7 +56,7 @@ namespace ExpressionAst {
     }
 
     export class MethodCall implements Expression {
-        constructor(public name:string,   public expressions: Expression[]) {
+        constructor(public name: string, public expressions: Expression[]) {
         }
     }
 
@@ -135,6 +136,7 @@ namespace ExpressionAst {
 
     export class SpecialRefAsExpr implements Expression {
     }
+
     export abstract class Operator {
     }
 
@@ -145,29 +147,49 @@ namespace ExpressionAst {
     export class Add extends ABinOp {
         value = "Add"
     }
+
     export class Subtract extends ABinOp {
         value = "Subtract"
     }
-    export class Multiply extends ABinOp {  value = "Multiply"}
-    export class Divide extends ABinOp {value = "Divide"}
+
+    export class Multiply extends ABinOp {
+        value = "Multiply"
+    }
+
+    export class Divide extends ABinOp {
+        value = "Divide"
+    }
 
     export interface BBinOp extends Operator {
     }
 
-    export abstract class BBinOp extends Operator{
+    export abstract class BBinOp extends Operator {
 
     }
 
-    export class And extends BBinOp {}
-    export class Or extends BBinOp {}
+    export class And extends BBinOp {
+    }
 
-    export abstract class RBinOp extends Operator {}
+    export class Or extends BBinOp {
+    }
 
-    export class GreaterEqual extends RBinOp {}
-    export class Greater extends RBinOp {}
-    export class LessEqual extends RBinOp {}
-    export class Less extends RBinOp {}
-    export class Equal extends RBinOp {}
+    export abstract class RBinOp extends Operator {
+    }
+
+    export class GreaterEqual extends RBinOp {
+    }
+
+    export class Greater extends RBinOp {
+    }
+
+    export class LessEqual extends RBinOp {
+    }
+
+    export class Less extends RBinOp {
+    }
+
+    export class Equal extends RBinOp {
+    }
 }
 
 export {ExpressionAst}

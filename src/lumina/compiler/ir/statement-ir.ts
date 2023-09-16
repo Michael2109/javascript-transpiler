@@ -9,20 +9,22 @@ namespace StatementIr {
         }
     }
 
-    export class Statement {}
+    export class Statement {
+    }
 
-   export class ClassModel extends Statement{
-        constructor(public name: string,  public parent: Type | undefined,  public fields: Field[],public statements: Array<Statement>) {
+    export class ClassModel extends Statement {
+        constructor(public name: string, public parent: Type | undefined, public fields: Field[], public statements: Array<Statement>) {
             super()
         }
     }
 
-    export class ModuleMethod extends Statement{
+    export class ModuleMethod extends Statement {
         constructor(public name: string, public statements: Array<Statement>) {
             super()
         }
     }
-    export class Method extends Statement{
+
+    export class Method extends Statement {
         constructor(public name: string, public statements: Array<Statement>) {
             super()
         }
@@ -34,17 +36,18 @@ namespace StatementIr {
     }
 
 
-    export class Type {}
+    export class Type {
+    }
 
-    export class LocalType extends Type{
+    export class LocalType extends Type {
         constructor(public name: string) {
             super();
         }
     }
 
-    export class Assign extends Statement{
+    export class Assign extends Statement {
         constructor(public name: string,
-                    public  immutable: boolean,
+                    public immutable: boolean,
                     public statement: Statement) {
             super()
         }
