@@ -1,5 +1,5 @@
 import {assertFail, assertSuccess} from "./parser-test-utils";
-import {expressionParser, expressions, methodCall, modifier} from "../../../src/lumina/parser/expression-parser";
+import {expressionParser, expressions, methodCall, modifier} from "../../../src/lumina/compiler/parser/expression-parser";
 import {ExpressionAst} from "../../../src/lumina/compiler/ast/expression-ast";
 import Public = ExpressionAst.Public;
 import Protected = ExpressionAst.Protected;

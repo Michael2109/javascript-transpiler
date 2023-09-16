@@ -1,27 +1,29 @@
-import {capture, cut, either, eitherMany, lazy, opt, P, regex, rep, seq, spaces, str} from "./parser";
-import {ExpressionAst} from "../compiler/ast/expression-ast"
+import {capture, cut, either, eitherMany, lazy, opt, P, regex, rep, seq, spaces, str} from "../../parser/parser";
+import {ExpressionAst} from "../ast/expression-ast"
 import {expressionParser, expressions} from "./expression-parser";
 import {identifier, keyword} from "./lexical-parser";
 
-import {DeclarationsAst} from "../compiler/ast/declarations-ast";
-import {StatementAst} from "../compiler/ast/statement-ast";
-import {ControlFlowAst} from "../compiler/ast/control-flow-ast";
+import {DeclarationAst} from "../ast/declaration-ast";
+import {StatementAst} from "../ast/statement-ast";
+import {ControlFlowAst} from "../ast/control-flow-ast";
 
 import Expression = ExpressionAst.Expression;
 import Ref = ExpressionAst.Type;
 import RefLocal = ExpressionAst.LocalType;
 
 import If = ControlFlowAst.If;
-import Method = DeclarationsAst.Method;
-import Field = DeclarationsAst.Field;
+import Method = DeclarationAst.Method;
+import Field = DeclarationAst.Field;
 import Statement = StatementAst.Statement;
 import ExprAsStmt = StatementAst.ExprAsStmt;
-import ClassModel = DeclarationsAst.ClassModel;
-import CompilationUnit = DeclarationsAst.CompilationUnit;
-import Assign = DeclarationsAst.Assign;
-import Reassign = DeclarationsAst.Reassign;
-import Import = DeclarationsAst.Import;
+import ClassModel = DeclarationAst.ClassModel;
+import CompilationUnit = DeclarationAst.CompilationUnit;
+import Assign = DeclarationAst.Assign;
+import Reassign = DeclarationAst.Reassign;
+import Import = DeclarationAst.Import;
 import LocalType = ExpressionAst.LocalType;
+import Namespace = DeclarationAst.Namespace;
+import {namespace} from "./declaration-parser";
 
 function compilationUnit(): P<CompilationUnit> {
     return rep(statement()).map(results => new CompilationUnit(
@@ -39,6 +41,13 @@ function importParser(): P<Import> {
         rep(identifier(), {sep: seq(spaces(), str("."), spaces())})
     )
         .map(results => new Import(results))
+}
+
+
+function statement(): P<Statement> {
+    return lazy(() =>
+        eitherMany<Statement>(namespace(), classParser(), method(), assign(), reassign(), expressionAsStatement())
+    )
 }
 
 function classParser(): P<ClassModel> {
@@ -174,12 +183,6 @@ function block(): P<Array<Statement>> {
     // TODO Should repeat by either a semi-colon or a newline
     return seq(spaces(), str("{"), spaces(), rep(statement(), {sep: spaces()}), spaces(), str("}"), spaces())
         .map(result => result)
-}
-
-function statement(): P<Statement> {
-    return lazy(() =>
-        eitherMany<Statement>(classParser(), method(), assign(), reassign(), expressionAsStatement())
-    )
 }
 
 function assign(): P<Assign> {

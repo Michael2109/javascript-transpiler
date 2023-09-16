@@ -1,5 +1,5 @@
-import {capture, cut, either, eitherMany, lazy, P, rep, seq, spaces, str} from "./parser";
-import {ExpressionAst} from "../compiler/ast/expression-ast"
+import {capture, cut, either, eitherMany, lazy, P, rep, seq, spaces, str} from "../../parser/parser";
+import {ExpressionAst} from "../ast/expression-ast"
 import {identifier, integer, keyword, variable} from "./lexical-parser";
 import Modifier = ExpressionAst.Modifier;
 import Public = ExpressionAst.Public;

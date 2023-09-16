@@ -1,6 +1,6 @@
-import {compilationUnit} from "../../../src/lumina/parser/statement-parser";
-import {DeclarationsAst} from "../../../src/lumina/compiler/ast/declarations-ast";
-import CompilationUnit = DeclarationsAst.CompilationUnit;
+import {compilationUnit} from "../../../src/lumina/compiler/parser/statement-parser";
+import {DeclarationAst} from "../../../src/lumina/compiler/ast/declaration-ast";
+import CompilationUnit = DeclarationAst.CompilationUnit;
 
 test('Test parse and compile  to JavaScript', () => {
 

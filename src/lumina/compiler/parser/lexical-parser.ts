@@ -1,11 +1,11 @@
-import {capture, charIn, charsWhileIn, cut, digit, either, P, rep, seq, str} from "./parser";
-import {ExpressionAst} from "../compiler/ast/expression-ast";
+import {capture, charIn, charsWhileIn, cut, digit, either, P, rep, seq, str} from "../../parser/parser";
+import {ExpressionAst} from "../ast/expression-ast";
 import IntConst = ExpressionAst.IntConst;
 import Variable = ExpressionAst.Variable;
 
 
 const KEYWORDS: Array<string> = Array(
-    "extends", "public", "protected", "private", "abstract", "open", "pure", "and", "del", "from", "not", "while",
+    "namespace","extends", "public", "protected", "private", "abstract", "open", "pure", "and", "del", "from", "not", "while",
     "as", "elif", "global", "or", "with",
     "assert", "else", "if", "pass", "yield",
     "break", "except", "import",

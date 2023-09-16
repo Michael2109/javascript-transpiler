@@ -11,19 +11,19 @@ import {
     ifStatement,
     method,
     reassign
-} from "../../../src/lumina/parser/statement-parser";
+} from "../../../src/lumina/compiler/parser/statement-parser";
 import {ControlFlowAst} from "../../../src/lumina/compiler/ast/control-flow-ast";
-import {DeclarationsAst} from "../../../src/lumina/compiler/ast/declarations-ast";
+import {DeclarationAst} from "../../../src/lumina/compiler/ast/declaration-ast";
 import ExprAsStmt = StatementAst.ExprAsStmt;
 import Variable = ExpressionAst.Variable;
 import If = ControlFlowAst.If;
 import IntConst = ExpressionAst.IntConst;
-import Method = DeclarationsAst.Method;
-import Field = DeclarationsAst.Field;
+import Method = DeclarationAst.Method;
+import Field = DeclarationAst.Field;
 import RefLocal = ExpressionAst.LocalType;
-import ClassModel = DeclarationsAst.ClassModel;
-import Assign = DeclarationsAst.Assign;
-import Reassign = DeclarationsAst.Reassign;
+import ClassModel = DeclarationAst.ClassModel;
+import Assign = DeclarationAst.Assign;
+import Reassign = DeclarationAst.Reassign;
 import LocalType = ExpressionAst.LocalType;
 
 test('Parse block', () => {
@@ -62,6 +62,7 @@ test('Parse field', () => {
         new Field("x", false, new RefLocal("ClassName")),
         "")
 });
+
 
 test('Parse class', () => {
 

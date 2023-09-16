@@ -1,7 +1,7 @@
 import {ExpressionAst} from "./expression-ast";
 import {StatementAst} from "./statement-ast";
 
-namespace DeclarationsAst {
+namespace DeclarationAst {
 
     import NameSpace = ExpressionAst.NameSpace;
     import Expression = ExpressionAst.Expression;
@@ -19,7 +19,6 @@ namespace DeclarationsAst {
                     public imports: Import[],
                     public statements: Statement[]) {
         }
-
     }
 
     export class Import {
@@ -27,8 +26,8 @@ namespace DeclarationsAst {
         }
     }
 
-    export class Field {
-        constructor(public name: string, public required: boolean, public ref: Type, public init?: Expression) {
+    export class Namespace {
+        constructor(public name: string, public statements: Array<Statement>) {
         }
     }
 
@@ -62,6 +61,11 @@ namespace DeclarationsAst {
 
     }
 
+    export class Field {
+        constructor(public name: string, public required: boolean, public ref: Type, public init?: Expression) {
+        }
+    }
+
     export class Assign implements Declaration {
         constructor(public name: string,
                     public type: Type | undefined,
@@ -78,4 +82,4 @@ namespace DeclarationsAst {
     }
 }
 
-export {DeclarationsAst}
+export {DeclarationAst}

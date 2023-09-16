@@ -1,8 +1,8 @@
 import {assertSuccess} from "./parser-test-utils";
-import {compilationUnit} from "../../../src/lumina/parser/statement-parser";
-import {DeclarationsAst} from "../../../src/lumina/compiler/ast/declarations-ast";
-import CompilationUnit = DeclarationsAst.CompilationUnit;
-import Method = DeclarationsAst.Method;
+import {compilationUnit} from "../../../src/lumina/compiler/parser/statement-parser";
+import {DeclarationAst} from "../../../src/lumina/compiler/ast/declaration-ast";
+import CompilationUnit = DeclarationAst.CompilationUnit;
+import Method = DeclarationAst.Method;
 
 test('Parse function', () => {
     assertSuccess(compilationUnit().createParser(

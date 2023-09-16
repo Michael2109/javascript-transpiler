@@ -1,4 +1,4 @@
-import {identifier, integer, keyword, stringLiteral, variable} from "../../../src/lumina/parser/lexical-parser";
+import {identifier, integer, keyword, stringLiteral, variable} from "../../../src/lumina/compiler/parser/lexical-parser";
 import {assertFail, assertSuccess} from "./parser-test-utils";
 import {ExpressionAst} from "../../../src/lumina/compiler/ast/expression-ast";
 import IntConst = ExpressionAst.IntConst;

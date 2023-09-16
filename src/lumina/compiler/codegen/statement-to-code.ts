@@ -1,5 +1,6 @@
 import {StatementIr} from "../ir/statement-ir";
 import {ExpressionToCode} from "./expression-to-code";
+import {DeclarationIr} from "../ir/declaration-ir";
 
 export namespace CodeGenerator {
 
@@ -9,6 +10,12 @@ export namespace CodeGenerator {
     export function compilationUnitToCode(compilationUnit: StatementIr.CompilationUnit): string {
         return compilationUnit.statements.map(statementToCode).join(" \n")
     }
+
+    function namespaceToCode(namespace: DeclarationIr.Namespace): string {
+
+        return `export namespace ${namespace.name} {` +namespace.statements.map(statementToCode) + "}"
+    }
+
 
     function classToCode(classModel: StatementIr.ClassModel): string {
 
@@ -72,6 +79,8 @@ export namespace CodeGenerator {
                 return assignToCode(statement as StatementIr.Assign)
             case StatementIr.ExprAsStmt:
                 return exprAsStmtToCode(statement as StatementIr.ExprAsStmt)
+            case DeclarationIr.Namespace:
+                return namespaceToCode(statement as DeclarationIr.Namespace)
             default:
                 throw new Error("Not found: " + JSON.stringify(statement))
         }

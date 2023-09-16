@@ -2,15 +2,16 @@ import {ExpressionAst} from "../ast/expression-ast";
 import {StatementAst} from "../ast/statement-ast";
 import {ExpressionIr} from "../ir/expression-ir";
 import {StatementIr} from "../ir/statement-ir";
-import {DeclarationsAst} from "../ast/declarations-ast";
+import {DeclarationAst} from "../ast/declaration-ast";
+import {DeclarationIr} from "../ir/declaration-ir";
 
 export namespace AstToIr {
 
-    import ClassModel = DeclarationsAst.ClassModel;
+    import ClassModel = DeclarationAst.ClassModel;
     import Statement = StatementAst.Statement;
-    import Method = DeclarationsAst.Method;
-    import CompilationUnit = DeclarationsAst.CompilationUnit;
-    import Assign = DeclarationsAst.Assign;
+    import Method = DeclarationAst.Method;
+    import CompilationUnit = DeclarationAst.CompilationUnit;
+    import Assign = DeclarationAst.Assign;
     import IntConst = ExpressionAst.IntConst;
     import ExprAsStmt = StatementAst.ExprAsStmt;
     import Expression = ExpressionAst.Expression;
@@ -20,11 +21,12 @@ export namespace AstToIr {
     import Multiply = ExpressionAst.Multiply;
     import Divide = ExpressionAst.Divide;
     import Operator = ExpressionAst.Operator;
-    import Field = DeclarationsAst.Field;
+    import Field = DeclarationAst.Field;
     import RefLocal = ExpressionAst.LocalType;
     import Ref = ExpressionAst.Type;
     import Type = ExpressionAst.Type;
     import LocalType = ExpressionAst.LocalType;
+    import Namespace = DeclarationAst.Namespace;
 
 
     interface IrState {
@@ -33,6 +35,10 @@ export namespace AstToIr {
 
     export function compilationUnitToIr(compilationUnit: CompilationUnit): StatementIr.CompilationUnit {
         return new StatementIr.CompilationUnit(compilationUnit.statements.map(s => statementToIr(s, {isModule: true})))
+    }
+
+    function namespaceToIr(namespace: Namespace, irState: IrState): DeclarationIr.Namespace {
+        return new DeclarationIr.Namespace(namespace.name, namespace.statements.map(statement => statementToIr(statement, irState)))
     }
 
     function classToIr(classModel: ClassModel, irState: IrState): StatementIr.ClassModel {
@@ -93,6 +99,8 @@ export namespace AstToIr {
                 return assignToIr(statement as Assign, irState)
             case ExprAsStmt:
                 return exprAsStmtToIr(statement as ExprAsStmt, irState)
+            case Namespace:
+                return namespaceToIr(statement as Namespace, irState)
             default:
                 throw new Error("Unknown statement: " + JSON.stringify(statement))
         }

@@ -1,17 +1,14 @@
 #!/usr/bin/env node
 
-import {compilationUnit} from "./lumina/parser/statement-parser";
+import {compilationUnit} from "./lumina/compiler/parser/statement-parser";
 import {AstToIr} from "./lumina/compiler/asttoir/ast-to-ir";
 import {CodeGenerator} from "./lumina/compiler/codegen/statement-to-code";
-import {DeclarationsAst} from "./lumina/compiler/ast/declarations-ast";
+import {DeclarationAst} from "./lumina/compiler/ast/declaration-ast";
 import {StatementAst} from "./lumina/compiler/ast/statement-ast";
 import js_beautify from "js-beautify";
 import fs from 'fs';
 import path from 'path';
-import CompilationUnit = DeclarationsAst.CompilationUnit;
-
-const {promisify} = require('util');
-const {resolve} = require('path');
+import CompilationUnit = DeclarationAst.CompilationUnit;
 
 function getFiles(basePath: string): string[] {
     const result: string[] = [];
