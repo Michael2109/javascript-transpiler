@@ -29,7 +29,7 @@ namespace ExpressionAst {
     class Pure extends Modifier
 
     class Expression
-    class MethodCall (name: string, expressions: Array[Expression])
-    class NewClassInstance (type: Type, expressions: Array[Expression])
+    class MethodCall (name: string, expressions: Array[Expression]) extends Expression
+    class NewClassInstance (type: Type, expressions: Array[Expression]) extends Expression
     class StringLiteral (value: string)  extends Expression
 }

@@ -54,6 +54,10 @@ luminaFiles.forEach((file: any) => {
     const fileContent = fs.readFileSync("./src/" + file, 'utf8')
     const parseResult = compilationUnit().createParser(fileContent);
 
+    if(!parseResult.success){
+        throw new Error("Error: " + parseResult.remaining)
+    }
+
     const value: CompilationUnit = parseResult.value
 
     const code = js_beautify.js_beautify(CodeGenerator.compilationUnitToCode(AstToIr.compilationUnitToIr(value)))

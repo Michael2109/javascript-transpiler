@@ -1,4 +1,4 @@
-import {capture, cut, either, eitherMany, lazy, opt, P, regex, rep, seq, spaces, str} from "../../parser/parser";
+import {capture, cut, either, eitherMany, end, lazy, opt, P, regex, rep, seq, spaces, str} from "../../parser/parser";
 import {ExpressionAst} from "../ast/expression-ast"
 import {expressionParser, expressions} from "./expression-parser";
 import {identifier, keyword} from "./lexical-parser";
@@ -26,7 +26,7 @@ import Namespace = DeclarationAst.Namespace;
 import {namespace} from "./declaration-parser";
 
 function compilationUnit(): P<CompilationUnit> {
-    return rep(statement()).map(results => new CompilationUnit(
+    return seq(rep(statement()), end()).map(results => new CompilationUnit(
         {nameSpace: []},
         [],
         results

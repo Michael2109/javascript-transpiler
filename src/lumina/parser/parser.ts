@@ -4,6 +4,10 @@ const DIGIT_REGEX: RegExp = new RegExp(`^[0-9]+`);
 
 type Parser<T> = (input: string) => ParseResult<T>
 
+export function parse <T> (input: string, p: P<T>): ParseResult<T>{
+    return  p.createParser(input)
+}
+
 class P<T> {
     public readonly createParser: Parser<T>;
 
@@ -20,10 +24,11 @@ class P<T> {
             // @ts-ignore
             const transformedValue: U = parseResult.success ? transform(parseResult.value) : undefined;
 
+            const parseSuccess = parseResult as ParseSuccess<T>
             return {
-                success: parseResult.success,
+                success: parseSuccess.success,
                 value: transformedValue,
-                remaining: parseResult.remaining
+                remaining: parseSuccess.remaining
             };
         }
 
@@ -36,19 +41,37 @@ class P<T> {
 
         return new P<T>((input: string) => {
             const parseResult: ParseResult<T> = t.createParser(input);
-            const success: boolean = applyFilter(parseResult.value);
-            return {success: success, value: parseResult.value, remaining: parseResult.remaining};
+
+            if(parseResult.success){
+                const parseSuccess = parseResult as ParseSuccess<T>
+                const success: boolean = applyFilter(parseResult.value);
+                if(success) {
+                    return {success: true, value: parseSuccess.value, remaining: parseSuccess.remaining};
+                }
+                return {success: false, input: input, position: -1, expected: [], disallowBacktrack: false}
+            } else {
+               return  parseResult as ParseFailure<T>
+            }
         })
     }
 }
 
-interface ParseResult<T> {
-    success: boolean;
+export interface ParseSuccess<T> {
+    success: true;
     value: T;
     stringValue?: string;
     remaining: string;
+}
+
+export interface ParseFailure<T> {
+    success: false
+    input: string
+    position: number;
+    expected: Array<string>
     disallowBacktrack?: boolean
 }
+
+type ParseResult<T> = ParseSuccess<T> | ParseFailure<T>
 
 type ElementTypeIfLengthOneOrZero<T extends any[]> = T['length'] extends 1 ? T[0] : (T['length'] extends 0 ? void : T);
 
@@ -58,11 +81,11 @@ type FilterOutVoid<T extends any[]> = T extends [infer Head, ...infer Rest]
         : [Head, ...FilterOutVoid<Rest>]
     : T;
 
-function removeVoidFromTuple<T extends any[]>(tuple: T): FilterOutVoid<T> {
-    return tuple.filter((item) => item !== undefined) as FilterOutVoid<T>;
-}
-
 function seq<T extends any[]>(...parsers: { [K in keyof T]: P<ElementTypeIfLengthOneOrZero<FilterOutVoid<T[K]>>> }): P<ElementTypeIfLengthOneOrZero<FilterOutVoid<T>>> {
+
+    function removeVoidFromTuple<T extends any[]>(tuple: T): FilterOutVoid<T> {
+        return tuple.filter((item) => item !== undefined) as FilterOutVoid<T>;
+    }
 
     return new P((input: string) => {
 
@@ -72,12 +95,14 @@ function seq<T extends any[]>(...parsers: { [K in keyof T]: P<ElementTypeIfLengt
 
         for (const parser of parsers) {
             let parseResult: ParseResult<any> = parser.createParser(remainingInput);
-            remainingInput = parseResult.remaining;
 
             if (parseResult.success) {
-                results.push(parseResult.value);
+                const success = parseResult as ParseSuccess<any>
+                remainingInput = success.remaining;
+
+                results.push(success.value);
             } else {
-                return {success: false, value: undefined, remaining: remainingInput}
+                return parseResult
             }
         }
 
@@ -91,9 +116,9 @@ function seq<T extends any[]>(...parsers: { [K in keyof T]: P<ElementTypeIfLengt
     })
 }
 
-function lazy<T>(fn: () => P<T>): P<T> {
+function lazy<T>(parserFunction: () => P<T>): P<T> {
     return new P<T>((input: string) => {
-        return fn().createParser(input)
+        return parserFunction().createParser(input)
     })
 }
 
@@ -104,7 +129,7 @@ function charIn(charPattern: string): P<string> {
         const match = input.match(`^[${charPattern}]`);
 
         if (match) {
-            return {success: true, value: match[0], remaining: input.slice(match[0].length)};
+            return {success: true, value: match[0], remaining: input.slice(match[0].length)} ;
         }
 
         return {success: false, value: undefined, remaining: input};
@@ -120,10 +145,11 @@ function charsWhileIn(chars: string): P<string> {
         let result = ""
         while (true) {
             const parseResult = charIn(chars).createParser(remainingInput)
-            remainingInput = parseResult.remaining;
 
             if (parseResult.success) {
-                result += parseResult.value
+                const parseSuccess = parseResult as ParseSuccess<string>
+                remainingInput = parseSuccess.remaining;
+                result += parseSuccess.value
             } else {
                 return {success: true, value: result, remaining: remainingInput}
 
@@ -133,6 +159,7 @@ function charsWhileIn(chars: string): P<string> {
 }
 
 function spaces(): P<void> {
+    // TODO Remove wrapper?
     return new P<void>((input: string) => {
 
         return charsWhileIn(" \r\n\t").map(() => {
@@ -146,9 +173,10 @@ function capture(parser: P<void>): P<string> {
         const parseResult = parser.createParser(input)
 
         if (parseResult.success) {
-            return {success: true, value: parseResult.stringValue, remaining: parseResult.remaining}
+            const parseSuccess = parseResult as ParseSuccess<void>
+            return {success: true, value: parseSuccess.stringValue, remaining: parseSuccess.remaining}
         } else {
-            return {success: false, value: undefined, remaining: input}
+            return {success: false, input: input, disallowBacktrack: false, expected: [], position: -1}
         }
     })
 }
@@ -165,7 +193,7 @@ function str(expected: string): P<void> {
                 remaining: input.slice(expected.length)
             };
         }
-        return {success: false, value: undefined, remaining: input};
+        return {success: false, input: input, disallowBacktrack: false, expected: [], position: -1}
     })
 }
 
@@ -179,8 +207,7 @@ function regex(expected: RegExp): P<void> {
             return {success: true, value: undefined, stringValue: match[0], remaining: input.slice(match[0].length)};
         }
 
-        return {success: false, value: undefined, remaining: input};
-
+        return {success: false, input: input, disallowBacktrack: false, expected: [], position: -1}
     })
 }
 
@@ -193,7 +220,7 @@ function end(): P<void> {
         if (input === "") {
             return {success: true, value: undefined, remaining: input};
         }
-        return {success: false, value: undefined, remaining: input};
+        return {success: false, input: input, disallowBacktrack: false, expected: [], position: -1}
     });
 }
 
@@ -207,7 +234,7 @@ function either<T, U>(parserA: P<T>, parserB: P<U>): P<T | U> {
         } else if (!result.disallowBacktrack) {
             return parserB.createParser(input)
         } else {
-            return {success: false, value: undefined, remaining: result.remaining}
+            return {success: false, input: input, disallowBacktrack: true, expected: [], position: -1}
         }
 
     })
@@ -224,7 +251,7 @@ function eitherMany<T>(...parsers: Array<P<T>>): P<T> {
             }
         }
 
-        return {success: false, value: undefined, remaining: input}
+        return {success: false, input: input, disallowBacktrack: false, expected: [], position: -1}
 
     })
 }
@@ -287,8 +314,7 @@ function opt<T>(parser: P<T>): P<Optional<T>> {
         if (parseResult.success) {
             return {success: true, value: new Optional(parseResult.value), remaining: parseResult.remaining};
         }
-        return {success: true, value: new Optional(undefined), remaining: parseResult.remaining}
-
+        return {success: true, value: new Optional(undefined), remaining: input}
     })
 }
 

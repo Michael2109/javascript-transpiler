@@ -1,0 +1,42 @@
+namespace DeclarationAst {
+
+    class Declaration extends Statement
+
+    class CompilationUnit(nameSpace: NameSpace, imports: Array[Import], statements: Array[Statement])
+
+    class Import(loc: Array[string])
+
+    class Namespace(name: string, statements: Array[Statement])
+
+    class Model extends Declaration
+
+    class ClassModel(
+        name: string,
+        modifiers: Array[Modifier],
+        fields: Array[Field],
+        parent: Type | undefined,
+        parentArguments: Array[Expression],
+        interfaces: Array[Type],
+        statements: Array[Statement]
+    ) extends Model
+
+    class Method (
+        name: string,
+        annotations: Array[Annotation],
+        fields: Array[Field],
+        modifiers: Array[Modifier],
+        returnType: Type | undefined,
+        statements: Array[Statement]
+    ) extends Declaration
+
+    class Field(name: string, required: boolean, ref: Type, init?: Expression)
+
+    class Assign(
+        name: string,
+        type: Type | undefined,
+        immutable: boolean,
+        statement: Statement
+    ) extends Declaration
+
+    class Reassign (name: string, statement: Statement) extends Statement
+}

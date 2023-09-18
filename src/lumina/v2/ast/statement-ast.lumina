@@ -1,0 +1,7 @@
+namespace StatementAst {
+
+    class Statement
+
+    class Return extends Statement
+    class ExprAsStmt(expression: Expression) extends Statement
+}
