@@ -133,4 +133,4 @@ function parenthesis(): P<Expression> {
     ))
 }
 
-export {expressions, modifier, methodCall, expressionParser, multiply, divide, add, subtract, parenthesis}
+export {expressions, modifier, methodCall, expressionParser, multiply, divide, add, subtract, parenthesis, chain}

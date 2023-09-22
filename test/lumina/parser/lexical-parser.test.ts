@@ -18,30 +18,30 @@ beforeAll(() => {
 test('Parse keywords', () => {
     assertSuccess(parse("public", keyword("public")), undefined, 6)
     assertSuccess(parse("class", keyword("class")),undefined, 5)
-    assertFailure(parse("other", keyword("other")))
+    assertFailure(parse("other", keyword("other")), 0)
 });
 
 test('Parse identifier', () => {
     assertSuccess(parse("example_123", identifier()), "example_123", 11)
-    assertFailure(parse("123_example",identifier()))
-    assertFailure(parse("",identifier()))
+    assertFailure(parse("123_example",identifier()),0)
+    assertFailure(parse("",identifier()), 0)
 });
 
 test('Parse string literal', () => {
     assertSuccess(parse("\" \"",stringLiteral()), " ", 3)
     assertSuccess(parse("\"example_123 \"",stringLiteral()), "example_123 ", 14)
-    assertFailure(parse("\"",stringLiteral()))
-    assertFailure(parse("",stringLiteral()))
-    assertFailure(parse("example_123",stringLiteral()))
+    assertFailure(parse("\"",stringLiteral()),0)
+    assertFailure(parse("",stringLiteral()),0)
+    assertFailure(parse("example_123",stringLiteral()),0)
 });
 
 test('Parse integer', () => {
     assertSuccess(parse("123",integer()), new IntConst(123), 3)
-    assertFailure(parse("",integer()))
+    assertFailure(parse("",integer()),0)
 });
 
 test('Parse variable', () => {
     assertSuccess(parse("a",variable()), new Variable("a"), 1)
     assertSuccess(parse("a_b_c",variable()), new Variable("a_b_c"), 5)
-    assertFailure(parse("1ab",variable()))
+    assertFailure(parse("1ab",variable()),0)
 });

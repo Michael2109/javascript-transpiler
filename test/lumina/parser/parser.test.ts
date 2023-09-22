@@ -139,10 +139,9 @@ test('Filter success', () => {
 
 test('Filter fail', () => {
 
-    const input = 'test';
-    const parseResult: ParseResult<string> = parse("test", capture(str(input)).filter(result => result.length > 4));
+    const parseResult: ParseResult<string> = parse("test", capture(str('test')).filter(result => result.length > 4));
 
-    assertFailure(parseResult)
+    assertFailure(parseResult, 4)
 });
 
 test('Sequence', () => {
@@ -167,5 +166,5 @@ test('End', () => {
     const parseResult: ParseResult<void> = parse("", end())
 
     assertSuccess(parseResult, undefined, 0)
-    assertFailure(parse("1", end()))
+    assertFailure(parse("1", end()), 0)
 });

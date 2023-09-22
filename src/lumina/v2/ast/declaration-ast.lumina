@@ -14,7 +14,7 @@ namespace DeclarationAst {
         name: string,
         modifiers: Array[Modifier],
         fields: Array[Field],
-        parent: Type | undefined,
+        parent?: Type,
         parentArguments: Array[Expression],
         interfaces: Array[Type],
         statements: Array[Statement]
@@ -25,7 +25,7 @@ namespace DeclarationAst {
         annotations: Array[Annotation],
         fields: Array[Field],
         modifiers: Array[Modifier],
-        returnType: Type | undefined,
+        returnType?: Type,
         statements: Array[Statement]
     ) extends Declaration
 
@@ -33,7 +33,7 @@ namespace DeclarationAst {
 
     class Assign(
         name: string,
-        type: Type | undefined,
+        type?: Type,
         immutable: boolean,
         statement: Statement
     ) extends Declaration

@@ -47,7 +47,7 @@ test('Parse access modifier', () => {
     assertSuccess(parse("protected",modifier()), Protected, 9)
     assertSuccess(parse("private", modifier()), Private, 7)
     assertSuccess(parse("open", modifier()), Open, 4)
-    assertFailure(parse("",modifier()))
+    assertFailure(parse("",modifier()), 0)
 });
 
 test('Parse method call', () => {
@@ -63,7 +63,7 @@ test('Parse method call', () => {
     assertSuccess(parse("example(  1  ,  2  ,  3  )",methodCall()),
         new MethodCall("example",
             [new IntConst(1), new IntConst(2), new IntConst(3)]), 26)
-    assertFailure(parse("",modifier()))
+    assertFailure(parse("",modifier()), 0)
 });
 
 test('Parse expressions', () => {

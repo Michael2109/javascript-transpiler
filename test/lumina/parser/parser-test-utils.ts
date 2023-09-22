@@ -8,7 +8,7 @@ function assertSuccess<T>(parseResult: ParseResult<T>, expectedValue: T, expecte
     expect(parseSuccess.position).toStrictEqual(expectedPosition)
 }
 
-function assertFailure<T>(parseResult: ParseResult<T>, expectedPosition?: number) {
+function assertFailure<T>(parseResult: ParseResult<T>, expectedPosition: number) {
     expect(parseResult.success).toBeFalsy()
     if(expectedPosition){
         expect(parseResult.position).toStrictEqual(expectedPosition)
