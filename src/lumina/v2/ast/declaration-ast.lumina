@@ -2,7 +2,7 @@ namespace DeclarationAst {
 
     class Declaration extends Statement
 
-    class CompilationUnit(nameSpace: NameSpace, imports: Array[Import], statements: Array[Statement])
+    class CompilationUnit(ns: NameSpace, imports: Array[Import], statements: Array[Statement])
 
     class Import(loc: Array[string])
 

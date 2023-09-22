@@ -4,12 +4,12 @@ import {DeclarationAst} from "../../../src/lumina/compiler/ast/declaration-ast";
 import CompilationUnit = DeclarationAst.CompilationUnit;
 import Method = DeclarationAst.Method;
 
+import {parse} from "../../../src/lumina/parser/parser";
 test('Parse function', () => {
-    assertSuccess(compilationUnit().createParser(
-            "let functionName(){}"),
+    assertSuccess(parse("let functionName(){}",compilationUnit()),
         new CompilationUnit(
             {nameSpace: []},
             [],
             [new Method("functionName", [], [], [], undefined, [])]
-        ), "")
+        ), 20)
 });

@@ -15,9 +15,8 @@ const KEYWORDS: Array<string> = Array(
     "let"
 )
 
-
 function letter(): P<string> {
-    return either(charIn("a-z"), charIn("A-Z"))
+    return either(capture(charIn("a-z")), capture(charIn("A-Z")))
 }
 
 function keyword(s: string): P<void> {
@@ -31,7 +30,7 @@ function identifier(): P<string> {
 }
 
 function stringLiteral(): P<string> {
-    return seq(str("\""), cut(charsWhileIn("a-z0-9\\s_-")), str("\"")).map(result => result)
+    return seq(str("\""), cut(capture(charsWhileIn("a-z0-9\\s_-"))), str("\"")).map(result => result)
 }
 
 function integer(): P<IntConst> {

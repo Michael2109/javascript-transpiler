@@ -3,12 +3,12 @@ import {DeclarationAst} from "../../../src/lumina/compiler/ast/declaration-ast";
 import Namespace = DeclarationAst.Namespace;
 import {namespace} from "../../../src/lumina/compiler/parser/declaration-parser";
 
+import {parse} from "../../../src/lumina/parser/parser";
 test('Parse namespace', () => {
 
-    assertSuccess(namespace().createParser(
-            "namespace NamespaceName {}"),
+    assertSuccess(parse("namespace NamespaceName {}",namespace()),
         new Namespace(
             "NamespaceName",
             []
-        ), "")
+        ), 26)
 })

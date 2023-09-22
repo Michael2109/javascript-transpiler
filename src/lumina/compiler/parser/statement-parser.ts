@@ -1,4 +1,4 @@
-import {capture, cut, either, eitherMany, end, lazy, opt, P, regex, rep, seq, spaces, str} from "../../parser/parser";
+import {capture, cut, either, eitherMany, end, lazy, opt, P, rep, seq, spaces, str} from "../../parser/parser";
 import {ExpressionAst} from "../ast/expression-ast"
 import {expressionParser, expressions} from "./expression-parser";
 import {identifier, keyword} from "./lexical-parser";
@@ -125,18 +125,18 @@ function field(): P<Field> {
         typeRef()
     ).map(results => new Field(results[1], !results[2].isPresent(), results[3]))
 }
-
+/*
 function comment(): P<void> {
 
     function blockComment(): P<void> {
         return seq(
-            cut(str("/*")),
+            cut(str("/!*")),
             regex(/(\*(?!\/)|[^*])*\*\//)
         )
     }
 
     return blockComment()
-}
+}*/
 
 
 function typeRef(): P<Ref> {
@@ -227,4 +227,4 @@ function expressionAsStatement(): P<ExprAsStmt> {
     return seq(spaces(), expressions(), spaces()).map(result => new ExprAsStmt(result))
 }
 
-export {compilationUnit, block, ifStatement, method, field, typeRef, comment, classParser, assign, reassign, statement}
+export {expressionAsStatement,compilationUnit, block, ifStatement, method, field, typeRef, classParser, assign, reassign, statement}

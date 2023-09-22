@@ -1,36 +1,43 @@
-import {identifier, integer, keyword, stringLiteral, variable} from "../../../src/lumina/compiler/parser/lexical-parser";
-import {assertFail, assertSuccess} from "./parser-test-utils";
+import {
+    identifier,
+    integer,
+    keyword,
+    stringLiteral,
+    variable,
+} from "../../../src/lumina/compiler/parser/lexical-parser";
+import {parse} from "../../../src/lumina/parser/parser";
+import {assertFailure, assertSuccess} from "./parser-test-utils";
 import {ExpressionAst} from "../../../src/lumina/compiler/ast/expression-ast";
 import IntConst = ExpressionAst.IntConst;
 import Variable = ExpressionAst.Variable;
 
 test('Parse keywords', () => {
-    assertSuccess(keyword("public").createParser("public"), undefined, "")
-    assertSuccess(keyword("class").createParser("class"), undefined, "")
-    assertFail(keyword("other").createParser("other"))
+    assertSuccess(parse("public", keyword("public")), undefined, 6)
+    assertSuccess(parse("class", keyword("class")),undefined, 5)
+    assertFailure(parse("other", keyword("other")))
 });
 
 test('Parse identifier', () => {
-    assertSuccess(identifier().createParser("example_123"), "example_123", "")
-    assertFail(identifier().createParser("123_example"))
-    assertFail(identifier().createParser(""))
+    assertSuccess(parse("example_123", identifier()), "example_123", 11)
+    assertFailure(parse("123_example",identifier()))
+    assertFailure(parse("",identifier()))
 });
 
 test('Parse string literal', () => {
-    assertSuccess(stringLiteral().createParser("\" \""), " ", "")
-    assertSuccess(stringLiteral().createParser("\"example_123 \""), "example_123 ", "")
-    assertFail(stringLiteral().createParser("\""))
-    assertFail(stringLiteral().createParser(""))
-    assertFail(stringLiteral().createParser("example_123"))
+    assertSuccess(parse("\" \"",stringLiteral()), " ", 3)
+    assertSuccess(parse("\"example_123 \"",stringLiteral()), "example_123 ", 14)
+    assertFailure(parse("\"",stringLiteral()))
+    assertFailure(parse("",stringLiteral()))
+    assertFailure(parse("example_123",stringLiteral()))
 });
 
 test('Parse integer', () => {
-    assertSuccess(integer().createParser("123"), new IntConst(123), "")
-    assertFail(integer().createParser(""))
+    assertSuccess(parse("123",integer()), new IntConst(123), 3)
+    assertFailure(parse("",integer()))
 });
 
 test('Parse variable', () => {
-    assertSuccess(variable().createParser("a"), new Variable("a"), "")
-    assertSuccess(variable().createParser("a_b_c"), new Variable("a_b_c"), "")
-    assertFail(variable().createParser("1ab"))
+    assertSuccess(parse("a",variable()), new Variable("a"), 1)
+    assertSuccess(parse("a_b_c",variable()), new Variable("a_b_c"), 5)
+    assertFailure(parse("1ab",variable()))
 });

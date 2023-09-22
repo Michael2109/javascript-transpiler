@@ -1,4 +1,5 @@
-import {assertFail, assertSuccess} from "./parser-test-utils";
+import {assertFailure, assertSuccess} from "./parser-test-utils";
+import {parse} from "../../../src/lumina/parser/parser";
 import {expressionParser, expressions, methodCall, modifier} from "../../../src/lumina/compiler/parser/expression-parser";
 import {ExpressionAst} from "../../../src/lumina/compiler/ast/expression-ast";
 import Public = ExpressionAst.Public;
@@ -13,16 +14,17 @@ import Subtract = ExpressionAst.Subtract;
 import Multiply = ExpressionAst.Multiply;
 
 test('Parse arithmetic', () => {
-    assertSuccess(expressions().createParser("1 - 2 + 5"),
+    assertSuccess(parse("1 - 2 + 5",expressions()),
         new ABinary(
             new Add(),
             new ABinary(
                 new Subtract(),
                 new IntConst(1),
                 new IntConst(2)),
-            new IntConst(5)), "")
+            new IntConst(5)),
+        9)
 
-    assertSuccess(expressions().createParser("1 - (2 + 5) * 3"),
+    assertSuccess(parse("1 - (2 + 5) * 3",expressions()),
         new ABinary(
             new Subtract(),
             new IntConst(1),
@@ -33,34 +35,34 @@ test('Parse arithmetic', () => {
                     new IntConst(2),
                     new IntConst(5)),
                 new IntConst(3))
-        ), "")
+        ), 15)
 });
 
 test('Parse access modifier', () => {
-    assertSuccess(modifier().createParser("public"), Public, "")
-    assertSuccess(modifier().createParser("protected"), Protected, "")
-    assertSuccess(modifier().createParser("private"), Private, "")
-    assertSuccess(modifier().createParser("open"), Open, "")
-    assertFail(modifier().createParser(""))
+    assertSuccess(parse("public", modifier()), Public, 6)
+    assertSuccess(parse("protected",modifier()), Protected, 9)
+    assertSuccess(parse("private", modifier()), Private, 7)
+    assertSuccess(parse("open", modifier()), Open, 4)
+    assertFailure(parse("",modifier()))
 });
 
 test('Parse method call', () => {
-    assertSuccess(methodCall().createParser("example()"), new MethodCall("example", []), "")
-    assertSuccess(methodCall().createParser("example(1)"),
-        new MethodCall("example", [new IntConst(1)]), "")
-    assertSuccess(methodCall().createParser("example(1,2,3)"),
+    assertSuccess(parse("example()",methodCall()), new MethodCall("example", []), 9)
+    assertSuccess(parse("example(1)",methodCall()),
+        new MethodCall("example", [new IntConst(1)]), 10)
+    assertSuccess(parse("example(1,2,3)",methodCall()),
         new MethodCall("example",
-            [new IntConst(1), new IntConst(2), new IntConst(3)]), "")
-    assertSuccess(methodCall().createParser("example(1  ,  2  ,  3)"), new MethodCall("example",
+            [new IntConst(1), new IntConst(2), new IntConst(3)]), 14)
+    assertSuccess(parse("example(1  ,  2  ,  3)",methodCall()), new MethodCall("example",
         [new IntConst(1), new IntConst(2), new IntConst(3)]
-    ), "")
-    assertSuccess(methodCall().createParser("example(  1  ,  2  ,  3  )"),
+    ), 22)
+    assertSuccess(parse("example(  1  ,  2  ,  3  )",methodCall()),
         new MethodCall("example",
-            [new IntConst(1), new IntConst(2), new IntConst(3)]), "")
-    assertFail(modifier().createParser(""))
+            [new IntConst(1), new IntConst(2), new IntConst(3)]), 26)
+    assertFailure(parse("",modifier()))
 });
 
 test('Parse expressions', () => {
-    assertSuccess(expressionParser().createParser("example()"), new MethodCall("example", []), "")
-    assertSuccess(expressionParser().createParser("1"), new IntConst(1), "")
+    assertSuccess(parse("example()",expressionParser()), new MethodCall("example", []), 9)
+    assertSuccess(parse("1",expressionParser()), new IntConst(1), 1)
 });

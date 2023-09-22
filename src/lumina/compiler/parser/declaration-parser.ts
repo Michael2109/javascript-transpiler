@@ -1,4 +1,4 @@
-import {P, seq, spaces} from "../../parser/parser";
+import {cut, P, seq, spaces} from "../../parser/parser";
 import {identifier, keyword} from "./lexical-parser";
 import {DeclarationAst} from "../ast/declaration-ast";
 import Namespace = DeclarationAst.Namespace;
@@ -8,7 +8,7 @@ import {block} from "./statement-parser";
 function namespace(): P<Namespace> {
 
     return seq(
-        keyword("namespace"),
+        cut(keyword("namespace")),
         spaces(),
         identifier(),
         block()

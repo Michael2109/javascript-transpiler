@@ -9,6 +9,7 @@ import js_beautify from "js-beautify";
 import fs from 'fs';
 import path from 'path';
 import CompilationUnit = DeclarationAst.CompilationUnit;
+import {parse, ParseFailure, ParseSuccess} from "./lumina/parser/parser";
 
 function getFiles(basePath: string): string[] {
     const result: string[] = [];
@@ -52,22 +53,26 @@ console.log(luminaFiles)
 luminaFiles.forEach((file: any) => {
 
     const fileContent = fs.readFileSync("./src/" + file, 'utf8')
-    const parseResult = compilationUnit().createParser(fileContent);
+    const parseResult = parse(fileContent, compilationUnit());
 
-    if(!parseResult.success){
-        throw new Error("Error: " + parseResult.remaining)
+    if(parseResult.success){
+
+const parseSuccess = parseResult as ParseSuccess<CompilationUnit>
+        const value: CompilationUnit = parseSuccess.value
+
+        const code = js_beautify.js_beautify(CodeGenerator.compilationUnitToCode(AstToIr.compilationUnitToIr(value)))
+
+        const newFileName = file.substr(0, file.lastIndexOf(".")) + ".js"
+
+        const outputPath = process.cwd() + "\\dist\\" + newFileName; // Resolve the relative path to an absolute path
+        ensureDirectoryExistence(outputPath)
+        fs.writeFileSync(outputPath, code, 'utf8');
+
+    } else {
+
+        const parseFailure = parseResult as ParseFailure<CompilationUnit>
+        throw new Error("Syntax error: " +parseFailure.position + " : "+ fileContent.slice( parseFailure.position))
     }
-
-    const value: CompilationUnit = parseResult.value
-
-    const code = js_beautify.js_beautify(CodeGenerator.compilationUnitToCode(AstToIr.compilationUnitToIr(value)))
-
-    const newFileName = file.substr(0, file.lastIndexOf(".")) + ".js"
-
-    const outputPath = process.cwd() + "\\dist\\" + newFileName; // Resolve the relative path to an absolute path
-    ensureDirectoryExistence(outputPath)
-    fs.writeFileSync(outputPath, code, 'utf8');
-
 })
 
 

@@ -1,15 +1,18 @@
 import {ParseResult, ParseSuccess} from "../../../src/lumina/parser/parser";
 
-function assertSuccess<T>(parseResult: ParseResult<T>, expectedValue: T, expectedRemaining: string) {
+function assertSuccess<T>(parseResult: ParseResult<T>, expectedValue: T, expectedPosition: number) {
     expect(parseResult.success).toBeTruthy()
 
     const parseSuccess = parseResult as ParseSuccess<T>
     expect(parseSuccess.value).toStrictEqual(expectedValue)
-    expect(parseSuccess.remaining).toBe(expectedRemaining)
+    expect(parseSuccess.position).toStrictEqual(expectedPosition)
 }
 
-function assertFail<T>(parseResult: ParseResult<T>) {
+function assertFailure<T>(parseResult: ParseResult<T>, expectedPosition?: number) {
     expect(parseResult.success).toBeFalsy()
+    if(expectedPosition){
+        expect(parseResult.position).toStrictEqual(expectedPosition)
+    }
 }
 
-export {assertSuccess, assertFail}
+export {assertSuccess, assertFailure}

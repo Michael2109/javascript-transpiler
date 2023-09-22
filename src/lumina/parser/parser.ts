@@ -1,11 +1,12 @@
 import {Optional} from "./optional";
+import {InputStream} from "./input-stream";
 
 const DIGIT_REGEX: RegExp = new RegExp(`^[0-9]+`);
 
-type Parser<T> = (input: string) => ParseResult<T>
+type Parser<T> = (inputStream: InputStream) => ParseResult<T>
 
 export function parse <T> (input: string, p: P<T>): ParseResult<T>{
-    return  p.createParser(input)
+    return  p.createParser(new InputStream(input))
 }
 
 class P<T> {
@@ -19,17 +20,20 @@ class P<T> {
 
         const t = this;
 
-        const p: Parser<U> = (input: string) => {
-            const parseResult: ParseResult<T> = t.createParser(input);
-            // @ts-ignore
-            const transformedValue: U = parseResult.success ? transform(parseResult.value) : undefined;
+        const p: Parser<U> = (inputStream: InputStream) => {
+            const parseResult: ParseResult<T> = t.createParser(inputStream);
 
-            const parseSuccess = parseResult as ParseSuccess<T>
-            return {
-                success: parseSuccess.success,
-                value: transformedValue,
-                remaining: parseSuccess.remaining
-            };
+            if(parseResult.success) {
+                const parseSuccess = parseResult as ParseSuccess<T>
+                const transformedValue: U = transform(parseSuccess.value);
+
+                return {
+                    success: true,
+                    value: transformedValue,
+                    position: parseResult.position
+                };
+            }
+            return parseResult
         }
 
         return new P<U>(p)
@@ -39,39 +43,192 @@ class P<T> {
 
         const t = this;
 
-        return new P<T>((input: string) => {
-            const parseResult: ParseResult<T> = t.createParser(input);
+        return new P<T>((inputStream: InputStream) => {
+            const parseResult: ParseResult<T> = t.createParser(inputStream);
 
             if(parseResult.success){
                 const parseSuccess = parseResult as ParseSuccess<T>
-                const success: boolean = applyFilter(parseResult.value);
+                const success: boolean = applyFilter(parseSuccess.value);
                 if(success) {
-                    return {success: true, value: parseSuccess.value, remaining: parseSuccess.remaining};
+                    return {success: true, value: parseSuccess.value, position: parseSuccess.position};
                 }
-                return {success: false, input: input, position: -1, expected: [], disallowBacktrack: false}
-            } else {
-               return  parseResult as ParseFailure<T>
+                return {success: false, position: inputStream.position}
             }
+            return  parseResult as ParseFailure<T>
         })
     }
 }
 
-export interface ParseSuccess<T> {
+export interface ParseSuccess<T> extends ParseResult<T> {
     success: true;
     value: T;
     stringValue?: string;
-    remaining: string;
 }
 
-export interface ParseFailure<T> {
+export interface ParseFailure<T> extends ParseResult<T>{
+    label?: string
     success: false
-    input: string
-    position: number;
     expected: Array<string>
-    disallowBacktrack?: boolean
 }
 
-type ParseResult<T> = ParseSuccess<T> | ParseFailure<T>
+interface ParseResult<T> {
+    success: boolean;
+    position: number;
+    disallowBacktrack?: boolean;
+}
+
+function str(expected: string): P<void> {
+
+    return new P<void>((inputStream: InputStream) => {
+
+        console.log("Searching string")
+        console.log(expected)
+
+        for (let expectedChar of expected) {
+            if (inputStream.peek() !== expectedChar) {
+
+                const tempPosition = inputStream.position
+
+                return {
+                    success: false,
+                    disallowBacktrack: false,
+                    expected: [],
+                    position: tempPosition
+                }
+            }
+            inputStream.next()
+        }
+        return {
+            success: true,
+            value: undefined,
+            stringValue: expected,
+            position: inputStream.position
+        };
+    })
+}
+
+function capture(parser: P<void>): P<string> {
+    // @ts-ignore
+    return new P<string>((inputStream: InputStream) => {
+        const parseResult = parser.createParser(inputStream)
+
+        if (parseResult.success) {
+            const parseSuccess = parseResult as ParseSuccess<void>
+            return {success: true, value: parseSuccess.stringValue, position: parseSuccess.position}
+        }
+        return parseResult
+    })
+}
+
+function cut<T>(parser: P<T>): P<T> {
+    return new P<T>((inputStream: InputStream) => {
+        const result = parser.createParser(inputStream);
+        if (result.success) {
+            const parseSuccess = result as ParseSuccess<T>
+            parseSuccess.disallowBacktrack = true;
+            return parseSuccess;
+        } else {
+            return result
+        }
+    })
+}
+
+function digit(): P<number> {
+    return rep(capture(charIn("0-9")), {min: 1}).map(characters => +characters.join(""))
+}
+
+function charIn(expected: string): P<void> {
+    return new P<void>((inputStream: InputStream) => {
+        const char = inputStream.peek()
+
+        if (char) {
+            const match = char.match("[" + expected + "]");
+
+            if (match) {
+                inputStream.next()
+                return {success: true, value: undefined, stringValue: char, position: inputStream.position};
+            }
+        }
+        return {success: false, position: inputStream.position, disallowBacktrack: false, expected: []}
+    });
+}
+
+
+function charsWhileIn(characters: string): P<void> {
+    return new P<void>((inputStream: InputStream) => {
+
+
+        let result = ""
+        while (true) {
+            const parseResult = charIn(characters).createParser(inputStream)
+
+            if (parseResult.success) {
+                const parseSuccess = parseResult as ParseSuccess<string>
+                result += parseSuccess.stringValue
+            } else {
+                return {success: true, value: undefined, stringValue: result, position: inputStream.position}
+
+            }
+        }
+    })
+}
+
+
+function spaces(): P<void> {
+    return charsWhileIn(" \r\n\t")
+}
+
+function rep<T>(parser: P<T>, options: {
+    min?: number,
+    max?: number,
+    sep?: P<any>
+} = {min: 0}): P<Array<T>> {
+
+    return new P<Array<T>>((inputStream: InputStream) => {
+
+        const results: Array<T> = []
+
+        const sep = options?.sep
+
+        let occurrences = 0;
+
+        while (true) {
+            const parseResult = parser.createParser(inputStream)
+            if (parseResult.success) {
+                const parseSuccess = parseResult as ParseSuccess<T>
+                results.push(parseSuccess.value)
+
+                occurrences++;
+                if (sep !== undefined) {
+                    // Parse separator - If fails, break
+                    const sepParseResult = sep.createParser(inputStream);
+                    if (!sepParseResult.success) {
+                        break;
+                    }
+                }
+            } else {
+                break;
+            }
+        }
+
+        if (options) {
+            if (options.min && occurrences < options.min) {
+                return {success: false, position: inputStream.position, disallowBacktrack: false, expected: []}
+            }
+        }
+
+        return {success: true, value: results, position: inputStream.position};
+    })
+}
+
+function end(): P<void> {
+    return new P<void>((inputStream: InputStream) => {
+        if (inputStream.isEmpty()) {
+            return {success: true, value: undefined, position: inputStream.position};
+        }
+        return {success: false, position: inputStream.position, disallowBacktrack: false, expected: []}
+    });
+}
 
 type ElementTypeIfLengthOneOrZero<T extends any[]> = T['length'] extends 1 ? T[0] : (T['length'] extends 0 ? void : T);
 
@@ -87,154 +244,82 @@ function seq<T extends any[]>(...parsers: { [K in keyof T]: P<ElementTypeIfLengt
         return tuple.filter((item) => item !== undefined) as FilterOutVoid<T>;
     }
 
-    return new P((input: string) => {
+    return new P((inputStream: InputStream) => {
 
-        let remainingInput = input;
-
-        let results: any[] = []
+        let results: ParseSuccess<any>[] = []
 
         for (const parser of parsers) {
-            let parseResult: ParseResult<any> = parser.createParser(remainingInput);
+            let parseResult: ParseResult<any> = parser.createParser(inputStream);
 
             if (parseResult.success) {
                 const success = parseResult as ParseSuccess<any>
-                remainingInput = success.remaining;
 
-                results.push(success.value);
+                results.push(success);
             } else {
+                parseResult.disallowBacktrack = results.some(r => r.disallowBacktrack)
                 return parseResult
             }
         }
 
-        const filteredResults = removeVoidFromTuple(results as T)
+        const filteredResults = removeVoidFromTuple(results.map(r => r.value) as T)
 
+        console.log("Disallow!")
+        console.log(filteredResults.some(r => r.disallowBacktrack))
         return {
             success: true,
             value: filteredResults.length > 1 ? filteredResults : filteredResults[0],
-            remaining: remainingInput
+            position: inputStream.position,
+            disallowBacktrack: filteredResults.some(r => r.disallowBacktrack)
         };
     })
 }
 
-function lazy<T>(parserFunction: () => P<T>): P<T> {
-    return new P<T>((input: string) => {
-        return parserFunction().createParser(input)
-    })
-}
 
-function charIn(charPattern: string): P<string> {
-    // @ts-ignore
-    return new P<string>((input: string) => {
+function opt<T>(parser: P<T>): P<Optional<T>> {
 
-        const match = input.match(`^[${charPattern}]`);
+    return new P<Optional<T>>((inputStream: InputStream) => {
 
-        if (match) {
-            return {success: true, value: match[0], remaining: input.slice(match[0].length)} ;
-        }
-
-        return {success: false, value: undefined, remaining: input};
-    })
-}
-
-
-function charsWhileIn(chars: string): P<string> {
-    return new P<string>((input: string) => {
-
-        let remainingInput = input;
-
-        let result = ""
-        while (true) {
-            const parseResult = charIn(chars).createParser(remainingInput)
-
-            if (parseResult.success) {
-                const parseSuccess = parseResult as ParseSuccess<string>
-                remainingInput = parseSuccess.remaining;
-                result += parseSuccess.value
-            } else {
-                return {success: true, value: result, remaining: remainingInput}
-
-            }
-        }
-    })
-}
-
-function spaces(): P<void> {
-    // TODO Remove wrapper?
-    return new P<void>((input: string) => {
-
-        return charsWhileIn(" \r\n\t").map(() => {
-        }).createParser(input)
-    })
-}
-
-function capture(parser: P<void>): P<string> {
-    // @ts-ignore
-    return new P<string>((input: string) => {
-        const parseResult = parser.createParser(input)
-
+        const parseResult = parser.createParser(inputStream);
         if (parseResult.success) {
-            const parseSuccess = parseResult as ParseSuccess<void>
-            return {success: true, value: parseSuccess.stringValue, remaining: parseSuccess.remaining}
-        } else {
-            return {success: false, input: input, disallowBacktrack: false, expected: [], position: -1}
+            const parseSuccess = parseResult as ParseSuccess<T>
+            return {success: true, value: new Optional(parseSuccess.value), position: parseSuccess.position};
         }
+        return {success: true, value: new Optional(undefined), position: inputStream.position}
     })
 }
 
-function str(expected: string): P<void> {
 
-    return new P<void>((input: string) => {
+function index<T>(parser: P<T>): P<number> {
 
-        if (input.startsWith(expected)) {
-            return {
-                success: true,
-                value: undefined,
-                stringValue: expected,
-                remaining: input.slice(expected.length)
-            };
+    return new P<number>((inputStream: InputStream) => {
+
+        const parseResult = parser.createParser(inputStream);
+        if (parseResult.success) {
+            const parseSuccess = parseResult as ParseSuccess<T>
+            return {success: true, value: inputStream.position, position: parseSuccess.position};
         }
-        return {success: false, input: input, disallowBacktrack: false, expected: [], position: -1}
+        return {success: true, value: new Optional(undefined), position: inputStream.position}
     })
-}
-
-function regex(expected: RegExp): P<void> {
-
-    return new P<void>((input: string) => {
-
-        const match = input.match(expected);
-
-        if (match) {
-            return {success: true, value: undefined, stringValue: match[0], remaining: input.slice(match[0].length)};
-        }
-
-        return {success: false, input: input, disallowBacktrack: false, expected: [], position: -1}
-    })
-}
-
-function digit(): P<string> {
-    return capture(regex(DIGIT_REGEX))
-}
-
-function end(): P<void> {
-    return new P<void>((input: string) => {
-        if (input === "") {
-            return {success: true, value: undefined, remaining: input};
-        }
-        return {success: false, input: input, disallowBacktrack: false, expected: [], position: -1}
-    });
 }
 
 function either<T, U>(parserA: P<T>, parserB: P<U>): P<T | U> {
 // @ts-ignore
-    return new P<T | U>((input: string) => {
+    return new P<T | U>((inputStream: InputStream) => {
 
-        const result = parserA.createParser(input);
+        const originalPosition = inputStream.position
+        const result = parserA.createParser(inputStream);
         if (result.success) {
             return result;
-        } else if (!result.disallowBacktrack) {
-            return parserB.createParser(input)
         } else {
-            return {success: false, input: input, disallowBacktrack: true, expected: [], position: -1}
+
+            const parseFailure = result as ParseFailure<T | U>
+
+            if (!parseFailure.disallowBacktrack) {
+                inputStream.position = originalPosition
+                return parserB.createParser(inputStream)
+            } else {
+                return parseFailure
+            }
         }
 
     })
@@ -242,91 +327,32 @@ function either<T, U>(parserA: P<T>, parserB: P<U>): P<T | U> {
 
 function eitherMany<T>(...parsers: Array<P<T>>): P<T> {
 // @ts-ignore
-    return new P<T>((input: string) => {
+    return new P<T>((inputStream: InputStream) => {
 
+        const originalPosition = inputStream.position
         for (let parser of parsers) {
-            const parseResult = parser.createParser(input)
+            const parseResult = parser.createParser(inputStream)
             if (parseResult.success) {
                 return parseResult
-            }
-        }
-
-        return {success: false, input: input, disallowBacktrack: false, expected: [], position: -1}
-
-    })
-}
-
-function cut<T>(parser: P<T>): P<T> {
-    return new P<T>((input: string) => {
-        const result = parser.createParser(input);
-        if (result.success) {
-            return result;
-        } else {
-            result.disallowBacktrack = true;
-            return result
-        }
-    })
-}
-
-function rep<T>(parser: P<T>, options?: {
-    min?: number,
-    max?: number,
-    sep?: P<unknown>
-}): P<Array<T>> {
-
-    return new P<Array<T>>((input: string) => {
-
-        const results: Array<T> = []
-        let remainingInput = input;
-
-        const sep = options?.sep
-
-        while (true) {
-            const parseResult = parser.createParser(remainingInput)
-            if (parseResult.success) {
-                results.push(parseResult.value)
-                remainingInput = parseResult.remaining;
-
-                if (sep !== undefined) {
-                    // Parse separator - If fails, break
-                    const sepParseResult = sep.createParser(remainingInput);
-                    if (sepParseResult.success) {
-                        remainingInput = sepParseResult.remaining
-                    } else {
-                        break;
-                    }
+            }  else {
+                const parseFailure = parseResult as ParseFailure<T>
+                if (!parseFailure.disallowBacktrack) {
+                    inputStream.position = originalPosition
+                } else{
+                    console.log("Backtrack disallowed")
+                    console.log(inputStream.position)
+                    return {success: false, position: inputStream.position, disallowBacktrack: true, expected: []}
                 }
-            } else {
-                break;
             }
         }
 
-        return {success: true, value: results, remaining: remainingInput};
+        return {success: false, position: inputStream.position, disallowBacktrack: false, expected: []}
     })
 }
 
-function opt<T>(parser: P<T>): P<Optional<T>> {
-    // @ts-ignore
-    return new P<Optional<T>>((input: string) => {
-
-
-        const parseResult = parser.createParser(input);
-        if (parseResult.success) {
-            return {success: true, value: new Optional(parseResult.value), remaining: parseResult.remaining};
-        }
-        return {success: true, value: new Optional(undefined), remaining: input}
-    })
-}
-
-function index<T>(parser: Parser<T>): P<T> {
-    return new P<T>((input: string) => {
-        const result = parser(input);
-        if (result.success) {
-            return result;
-        } else {
-            result.disallowBacktrack = true;
-            return result
-        }
+function lazy<T>(parserFunction: () => P<T>): P<T> {
+    return new P<T>((inputStream: InputStream) => {
+        return parserFunction().createParser(inputStream)
     })
 }
 
@@ -334,7 +360,7 @@ export {
     Parser,
     P,
     ParseResult,
-    lazy,
+   lazy,
     capture,
     either,
     eitherMany,
@@ -344,7 +370,6 @@ export {
     str,
     end,
     rep,
-    regex,
     opt,
     charIn,
     charsWhileIn,
