@@ -5,6 +5,11 @@ import CompilationUnit = DeclarationAst.CompilationUnit;
 import Method = DeclarationAst.Method;
 
 import {parse} from "../../../src/lumina/parser/parser";
+
+beforeAll(() => {
+    global.console = require('console')
+})
+
 test('Parse function', () => {
     assertSuccess(parse("let functionName(){}",compilationUnit()),
         new CompilationUnit(

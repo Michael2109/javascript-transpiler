@@ -11,6 +11,10 @@ import {ExpressionAst} from "../../../src/lumina/compiler/ast/expression-ast";
 import IntConst = ExpressionAst.IntConst;
 import Variable = ExpressionAst.Variable;
 
+beforeAll(() => {
+    global.console = require('console')
+})
+
 test('Parse keywords', () => {
     assertSuccess(parse("public", keyword("public")), undefined, 6)
     assertSuccess(parse("class", keyword("class")),undefined, 5)

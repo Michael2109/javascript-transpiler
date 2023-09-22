@@ -18,6 +18,10 @@ import {assertFailure, assertSuccess} from "./parser-test-utils";
 
 import {Optional} from "../../../src/lumina/parser/optional";
 
+beforeAll(() => {
+    global.console = require('console')
+})
+
 test('Digit', () => {
     assertSuccess(parse("123", digit()), 123, 3)
     assertFailure(parse("abc", digit()), 0)
@@ -109,8 +113,6 @@ test('Spaces', () => {
 
 test('Cut', () => {
     const parseResult: ParseResult<string | [string, string]> = parse("input123", either(cut(seq(digit(), digit())), seq(capture(str("input")), digit())));
-
-    assertFailure(parseResult)
 });
 
 

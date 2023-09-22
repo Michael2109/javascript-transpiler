@@ -28,6 +28,11 @@ import Assign = DeclarationAst.Assign;
 import Reassign = DeclarationAst.Reassign;
 import LocalType = ExpressionAst.LocalType;
 import {namespace} from "../../../src/lumina/compiler/parser/declaration-parser";
+import Namespace = DeclarationAst.Namespace;
+
+beforeAll(() => {
+    global.console = require('console')
+})
 
 test('Parse expression as statement', () => {
     assertSuccess(parse("x", expressionAsStatement()), new ExprAsStmt(new Variable("x")), 1)
@@ -72,55 +77,7 @@ test('Parse field', () => {
 });
 
 test('Parse namespace', () => {
-
-    const input = "namespace DeclarationAst {\n" +
-        "\n" +
-        "    class Declaration extends Statement\n" +
-        "\n" +
-        "    class CompilationUnit(ns: NameSpace, imports: Array[Import], statements: Array[Statement])\n" +
-        "\n" +
-        "    class Import(loc: Array[string])\n" +
-        "\n" +
-        "    class Namespace(name: string, statements: Array[Statement])\n" +
-        "\n" +
-        "    class Model extends Declaration\n" +
-        "\n" +
-        "    class ClassModel(\n" +
-        "        name: string,\n" +
-        "        modifiers: Array[Modifier],\n" +
-        "        fields: Array[Field],\n" +
-        "        parent: Type | undefined,\n" +
-        "        parentArguments: Array[Expression],\n" +
-        "        interfaces: Array[Type],\n" +
-        "        statements: Array[Statement]\n" +
-        "    ) extends Model\n" +
-        "\n" +
-        "    class Method (\n" +
-        "        name: string,\n" +
-        "        annotations: Array[Annotation],\n" +
-        "        fields: Array[Field],\n" +
-        "        modifiers: Array[Modifier],\n" +
-        "        returnType: Type | undefined,\n" +
-        "        statements: Array[Statement]\n" +
-        "    ) extends Declaration\n" +
-        "\n" +
-        "    class Field(name: string, required: boolean, ref: Type, init?: Expression)\n" +
-        "\n" +
-        "    class Assign(\n" +
-        "        name: string,\n" +
-        "        type: Type | undefined,\n" +
-        "        immutable: boolean,\n" +
-        "        statement: Statement\n" +
-        "    ) extends Declaration\n" +
-        "\n" +
-        "    class Reassign (name: string, statement: Statement) extends Statement\n" +
-        "}"
-
-    console.log(input.slice(436))
-    console.log(parse(input, namespace()))
-
-    //assertSuccess(parse(input, namespace()), undefined, 1)
-
+    assertSuccess(parse("namespace X { }", namespace()), new Namespace("X", []), 15)
     assertFailure(parse("namespace X { #unknown-syntax }", namespace()),  14)
 });
 

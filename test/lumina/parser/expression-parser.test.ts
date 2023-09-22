@@ -13,6 +13,10 @@ import Add = ExpressionAst.Add;
 import Subtract = ExpressionAst.Subtract;
 import Multiply = ExpressionAst.Multiply;
 
+beforeAll(() => {
+    global.console = require('console')
+})
+
 test('Parse arithmetic', () => {
     assertSuccess(parse("1 - 2 + 5",expressions()),
         new ABinary(

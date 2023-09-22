@@ -81,9 +81,6 @@ function str(expected: string): P<void> {
 
     return new P<void>((inputStream: InputStream) => {
 
-        console.log("Searching string")
-        console.log(expected)
-
         for (let expectedChar of expected) {
             if (inputStream.peek() !== expectedChar) {
 
@@ -263,8 +260,6 @@ function seq<T extends any[]>(...parsers: { [K in keyof T]: P<ElementTypeIfLengt
 
         const filteredResults = removeVoidFromTuple(results.map(r => r.value) as T)
 
-        console.log("Disallow!")
-        console.log(filteredResults.some(r => r.disallowBacktrack))
         return {
             success: true,
             value: filteredResults.length > 1 ? filteredResults : filteredResults[0],
