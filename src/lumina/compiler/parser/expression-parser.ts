@@ -24,6 +24,7 @@ import GreaterEqual = ExpressionAst.GreaterEqual;
 import Greater = ExpressionAst.Greater;
 import LessEqual = ExpressionAst.LessEqual;
 import Less = ExpressionAst.Less;
+import Range = ExpressionAst.Range;
 
 function expressions(): P<Expression> {
     return booleanExpression();
@@ -31,7 +32,11 @@ function expressions(): P<Expression> {
 
 
 function expressionParser(): P<Expression> {
-    return lazy(() => eitherMany<Expression>(methodCall(), integer(), variable(), parenthesis()))
+    return lazy(() => eitherMany<Expression>(methodCall(), range(), integer(), variable(), parenthesis()))
+}
+
+function range(): P<Range> {
+    return seq(integer(), str(".."), integer()).map(results => new Range(results[0], results[1]))
 }
 
 
@@ -175,4 +180,4 @@ function parenthesis(): P<Expression> {
     ))
 }
 
-export {expressions, modifier, methodCall, expressionParser, multiply, divide, add, subtract, parenthesis, chain, booleanExpression}
+export {expressions, modifier, methodCall, expressionParser, multiply, divide, add, subtract, parenthesis, chain, booleanExpression, range}

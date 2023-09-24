@@ -340,8 +340,6 @@ function eitherMany<T>(...parsers: Array<P<T>>): P<T> {
                 if (!parseFailure.disallowBacktrack) {
                     inputStream.position = originalPosition
                 } else{
-                    console.log("Backtrack disallowed")
-                    console.log(inputStream.position)
                     return {success: false, position: inputStream.position, disallowBacktrack: true, expected: []}
                 }
             }

@@ -126,6 +126,12 @@ namespace ExpressionAst {
         }
     }
 
+    export class Range implements Expression {
+        constructor(public start: IntConst, public end: IntConst) {
+        }
+    }
+
+
     export class Negate implements Expression {
         constructor(public expression: Expression) {
         }

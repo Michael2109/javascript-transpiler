@@ -9,16 +9,24 @@ namespace ControlFlowAst {
     import Statement = StatementAst.Statement;
     import Assign = DeclarationAst.Assign;
     import BBinary = ExpressionAst.BBinary;
+    import Variable = ExpressionAst.Variable;
 
     export class ControlFlow extends StatementAst.Statement {
     }
 
     export class For implements ControlFlow {
-        constructor(public assign: Assign, public condition: Expression, public increment: Statement, public statements: Statement ) {
+        constructor(public variableName: string, public collection: Expression, public statements: Statement ) {
+        }
+    }
+
+    export class DoWhile implements ControlFlow {
+        constructor(public condition: Expression, public statements: Array<Statement>) {
         }
     }
 
     export class While implements ControlFlow {
+        constructor(public condition: Expression, public statements: Array<Statement>) {
+        }
     }
 
     export class If implements ControlFlow {
