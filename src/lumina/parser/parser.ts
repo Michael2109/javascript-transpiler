@@ -171,8 +171,14 @@ function charsWhileIn(characters: string): P<void> {
 }
 
 
-function spaces(): P<void> {
-    return charsWhileIn(" \r\n\t")
+function spaces(required?: boolean): P<void> {
+    if(required) {
+        return capture(charsWhileIn(" \r\n\t"))
+            .filter(chars => chars.length > 0)
+            .map(() => undefined)
+    } else {
+        return charsWhileIn(" \r\n\t")
+    }
 }
 
 function rep<T>(parser: P<T>, options: {

@@ -12,6 +12,9 @@ import ABinary = ExpressionAst.ABinary;
 import Add = ExpressionAst.Add;
 import Subtract = ExpressionAst.Subtract;
 import Multiply = ExpressionAst.Multiply;
+import BBinary = ExpressionAst.BBinary;
+import Greater = ExpressionAst.Greater;
+import RBinary = ExpressionAst.RBinary;
 
 beforeAll(() => {
     global.console = require('console')
@@ -40,6 +43,16 @@ test('Parse arithmetic', () => {
                     new IntConst(5)),
                 new IntConst(3))
         ), 15)
+});
+
+test('Parse boolean expressions', () => {
+    assertSuccess(parse("1 > 10",expressions()),
+        new RBinary(
+            new Greater(),
+                new IntConst(1),
+                new IntConst(10),
+           ),
+        6)
 });
 
 test('Parse access modifier', () => {

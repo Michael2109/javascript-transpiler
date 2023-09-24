@@ -18,9 +18,15 @@ import ABinary = ExpressionAst.ABinary;
 import RBinOp = ExpressionAst.RBinOp;
 import RBinary = ExpressionAst.RBinary;
 import Operator = ExpressionAst.Operator;
+import And = ExpressionAst.And;
+import Or = ExpressionAst.Or;
+import GreaterEqual = ExpressionAst.GreaterEqual;
+import Greater = ExpressionAst.Greater;
+import LessEqual = ExpressionAst.LessEqual;
+import Less = ExpressionAst.Less;
 
 function expressions(): P<Expression> {
-    return addSubtract();
+    return booleanExpression();
 }
 
 
@@ -95,7 +101,19 @@ function chain(parser1: P<Expression>, operatorParser1: P<Operator>, operatorPar
         })
 }
 
-function addSubtract(): P<Expression> {
+function booleanExpression(): P<Expression> {
+    return chain(greaterThanEqualGreaterThan(), and(), or())
+}
+
+function greaterThanEqualGreaterThan(): P<Expression> {
+    return chain(lessThanEqualLessThan(), greaterEqual(), greater())
+}
+
+function lessThanEqualLessThan(): P<Expression> {
+    return chain(arithmeticExpression(), lessEqual(), less())
+}
+
+function arithmeticExpression(): P<Expression> {
     return chain(multiplyDivide(), add(), subtract())
 }
 
@@ -105,6 +123,30 @@ function multiplyDivide(): P<Expression> {
 
 function value(): P<Expression> {
     return either(expressionParser(), parenthesis())
+}
+
+function and(): P<And> {
+    return str("&&").map(_ => new And())
+}
+
+function or(): P<Or> {
+    return str("||").map(_ => new Or())
+}
+
+function greaterEqual(): P<GreaterEqual> {
+    return str(">=").map(_ => new GreaterEqual())
+}
+
+function greater(): P<Greater> {
+    return str(">").map(_ => new Greater())
+}
+
+function lessEqual(): P<LessEqual> {
+    return str("<=").map(_ => new LessEqual())
+}
+
+function less(): P<Less> {
+    return str("<").map(_ => new Less())
 }
 
 function multiply(): P<Multiply> {
@@ -133,4 +175,4 @@ function parenthesis(): P<Expression> {
     ))
 }
 
-export {expressions, modifier, methodCall, expressionParser, multiply, divide, add, subtract, parenthesis, chain}
+export {expressions, modifier, methodCall, expressionParser, multiply, divide, add, subtract, parenthesis, chain, booleanExpression}

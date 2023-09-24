@@ -168,27 +168,34 @@ namespace ExpressionAst {
     }
 
     export class And extends BBinOp {
+        value = "And"
     }
 
     export class Or extends BBinOp {
+        value = "Or"
     }
 
     export abstract class RBinOp extends Operator {
     }
 
     export class GreaterEqual extends RBinOp {
+        value = "GreaterEqual"
     }
 
     export class Greater extends RBinOp {
+        value = "Greater"
     }
 
     export class LessEqual extends RBinOp {
+        value = "LessEqual"
     }
 
     export class Less extends RBinOp {
+        value = "Less"
     }
 
     export class Equal extends RBinOp {
+        value = "Equal"
     }
 }
 

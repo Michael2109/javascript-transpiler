@@ -1,6 +1,7 @@
 import {ParseResult, ParseSuccess} from "../../../src/lumina/parser/parser";
 
 function assertSuccess<T>(parseResult: ParseResult<T>, expectedValue: T, expectedPosition: number) {
+    console.log(parseResult)
     expect(parseResult.success).toBeTruthy()
 
     const parseSuccess = parseResult as ParseSuccess<T>

@@ -109,6 +109,10 @@ test('Spaces', () => {
     assertSuccess(parse("\r", spaces()), undefined, 1)
     assertSuccess(parse(" \r\n", spaces()), undefined, 3)
     assertSuccess(parse(" \r\ntest", spaces()), undefined, 3)
+
+    // Required
+    assertSuccess(parse(" ", spaces(true)), undefined, 1)
+    assertFailure(parse("", spaces(true)), 0)
 });
 
 test('Cut', () => {

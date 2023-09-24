@@ -189,6 +189,8 @@ function assign(): P<Assign> {
     return seq(
         str("let"),
         spaces(),
+        opt(capture(str("mutable"))),
+        spaces(),
         identifier(),
         spaces(),
         opt(seq(
@@ -200,10 +202,10 @@ function assign(): P<Assign> {
         str("="),
         statement()
     ).map(results => new Assign(
-            results[0],
-            results[1].get(),
-            true,
-            results[2]
+            results[1],
+            results[2].get(),
+            !results[0].isPresent(),
+            results[3]
         )
     )
 }
@@ -214,6 +216,7 @@ function reassign(): P<Reassign> {
         identifier(),
         spaces(),
         str("<-"),
+        spaces(),
         statement()
     ).map(results => new Reassign(
             results[0],

@@ -1,7 +1,11 @@
-import {capture, charIn, charsWhileIn, cut, digit, either, P, rep, seq, str} from "../../parser/parser";
+import {capture, charIn, charsWhileIn, cut, digit, either, opt, P, rep, seq, str} from "../../parser/parser";
 import {ExpressionAst} from "../ast/expression-ast";
 import IntConst = ExpressionAst.IntConst;
 import Variable = ExpressionAst.Variable;
+import {DeclarationAst} from "../ast/declaration-ast";
+import Reassign = DeclarationAst.Reassign;
+import ABinary = ExpressionAst.ABinary;
+import Add = ExpressionAst.Add;
 
 
 const KEYWORDS: Array<string> = Array(
@@ -38,7 +42,13 @@ function integer(): P<IntConst> {
 }
 
 function variable(): P<Variable> {
-    return identifier().map(result => new Variable(result))
+    return seq(identifier(), opt(capture(str("++")))).map(results => {
+        const v = new Variable(results[0]);
+        if(results[1].isPresent()){
+            return new Reassign(v.name, new ABinary(new Add(), v,new IntConst(1)))
+        }
+        return  v
+    })
 }
 
 export {letter, keyword, identifier, stringLiteral, integer, variable}
