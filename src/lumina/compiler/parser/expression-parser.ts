@@ -1,4 +1,4 @@
-import {capture, cut, either, eitherMany, lazy, P, rep, seq, spaces, str} from "../../parser/parser";
+import {capture, cut, either, eitherMany, lazy, opt, P, rep, seq, spaces, str} from "../../parser/parser";
 import {ExpressionAst} from "../ast/expression-ast"
 import {identifier, integer, keyword, variable} from "./lexical-parser";
 import Modifier = ExpressionAst.Modifier;
@@ -25,14 +25,19 @@ import Greater = ExpressionAst.Greater;
 import LessEqual = ExpressionAst.LessEqual;
 import Less = ExpressionAst.Less;
 import Range = ExpressionAst.Range;
+import {lambda} from "./declaration-parser";
+import Postfix = ExpressionAst.Postfix;
+import {Optional} from "../../parser/optional";
+import PostfixOperator = ExpressionAst.PostfixOperator;
+import Increment = ExpressionAst.Increment;
 
 function expressions(): P<Expression> {
-    return booleanExpression();
+    return postfix(booleanExpression());
 }
 
 
 function expressionParser(): P<Expression> {
-    return lazy(() => eitherMany<Expression>(methodCall(), range(), integer(), variable(), parenthesis()))
+    return lazy(() => postfix(eitherMany<Expression>(lambda(), range(), integer(), variable(), parenthesis())))
 }
 
 function range(): P<Range> {
@@ -50,19 +55,36 @@ function modifier(): P<Modifier> {
     )
 }
 
+function postfix(parser: P<Expression>): P<Expression> {
+    return seq(parser, opt(eitherMany(methodCall(), increment()))).map(results => {
+            const postfixSection = results[1].get()
+
+            if (postfixSection) {
+                return new Postfix(results[0], postfixSection)
+            }
+
+            return results[0]
+        }
+    )
+}
+
 function methodCall(): P<MethodCall> {
 
     return lazy(() =>
         seq(
-            identifier(),
             cut(capture(str("("))),
             spaces(),
             rep(expressionParser(), {sep: seq(spaces(), capture(str(",")), spaces())}),
             spaces(),
             capture(str(")"))
         )
-            .map<MethodCall>(result => new MethodCall(result[0], result[2]))
+            .map<MethodCall>(result => new MethodCall(result[1]))
     )
+}
+
+function increment(): P<Increment> {
+    return  capture(str("++"))
+        .map(result => new Increment())
 }
 
 /**

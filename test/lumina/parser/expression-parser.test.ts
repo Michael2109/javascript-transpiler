@@ -15,6 +15,8 @@ import Multiply = ExpressionAst.Multiply;
 import BBinary = ExpressionAst.BBinary;
 import Greater = ExpressionAst.Greater;
 import RBinary = ExpressionAst.RBinary;
+import Postfix = ExpressionAst.Postfix;
+import Variable = ExpressionAst.Variable;
 
 beforeAll(() => {
     global.console = require('console')
@@ -64,22 +66,27 @@ test('Parse access modifier', () => {
 });
 
 test('Parse method call', () => {
-    assertSuccess(parse("example()",methodCall()), new MethodCall("example", []), 9)
-    assertSuccess(parse("example(1)",methodCall()),
-        new MethodCall("example", [new IntConst(1)]), 10)
-    assertSuccess(parse("example(1,2,3)",methodCall()),
-        new MethodCall("example",
-            [new IntConst(1), new IntConst(2), new IntConst(3)]), 14)
-    assertSuccess(parse("example(1  ,  2  ,  3)",methodCall()), new MethodCall("example",
+    assertSuccess(parse("example()",expressionParser()), new Postfix(new Variable("example"),new MethodCall( [])), 9)
+    assertSuccess(parse("example(1)",expressionParser()),
+        new Postfix(
+            new Variable("example"),
+            new MethodCall([new IntConst(1)])
+        ), 10)
+    assertSuccess(parse("example(1,2,3)",expressionParser()),
+        new Postfix(
+            new Variable("example"),
+            new MethodCall([new IntConst(1), new IntConst(2), new IntConst(3)])
+        ), 14)
+    assertSuccess(parse("example(1  ,  2  ,  3)",expressionParser()),
+        new Postfix(new Variable("example"),new MethodCall(
         [new IntConst(1), new IntConst(2), new IntConst(3)]
-    ), 22)
-    assertSuccess(parse("example(  1  ,  2  ,  3  )",methodCall()),
-        new MethodCall("example",
-            [new IntConst(1), new IntConst(2), new IntConst(3)]), 26)
+    )), 22)
+    assertSuccess(parse("example(  1  ,  2  ,  3  )",expressionParser()),
+        new Postfix(new Variable("example"),new MethodCall(
+            [new IntConst(1), new IntConst(2), new IntConst(3)])), 26)
     assertFailure(parse("",modifier()), 0)
 });
 
 test('Parse expressions', () => {
-    assertSuccess(parse("example()",expressionParser()), new MethodCall("example", []), 9)
     assertSuccess(parse("1",expressionParser()), new IntConst(1), 1)
 });

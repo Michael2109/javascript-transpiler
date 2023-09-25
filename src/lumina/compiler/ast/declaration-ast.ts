@@ -61,6 +61,11 @@ namespace DeclarationAst {
 
     }
 
+    export class Lambda {
+        constructor(public fields: Array<Field>, public statements: Array<Statement>) {
+        }
+    }
+
     export class Field {
         constructor(public name: string, public required: boolean, public ref: Type, public init?: Expression) {
         }
@@ -80,6 +85,7 @@ namespace DeclarationAst {
                     public statement: Statement) {
         }
     }
+
 }
 
 export {DeclarationAst}

@@ -47,6 +47,5 @@ test('Parse integer', () => {
 test('Parse variable', () => {
     assertSuccess(parse("a",variable()), new Variable("a"), 1)
     assertSuccess(parse("a_b_c",variable()), new Variable("a_b_c"), 5)
-    assertSuccess(parse("x++",variable()),     new Reassign("x",  new ABinary(new Add(), new Variable("x"),new IntConst(1))), 3)
     assertFailure(parse("1ab",variable()),0)
 });

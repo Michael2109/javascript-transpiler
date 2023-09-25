@@ -42,12 +42,8 @@ function integer(): P<IntConst> {
 }
 
 function variable(): P<Variable> {
-    return seq(identifier(), opt(capture(str("++")))).map(results => {
-        const v = new Variable(results[0]);
-        if(results[1].isPresent()){
-            return new Reassign(v.name, new ABinary(new Add(), v,new IntConst(1)))
-        }
-        return  v
+    return identifier().map(results => {
+       return  new Variable(results);
     })
 }
 

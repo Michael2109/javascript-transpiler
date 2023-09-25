@@ -55,8 +55,24 @@ namespace ExpressionAst {
     export interface Expression {
     }
 
-    export class MethodCall implements Expression {
-        constructor(public name: string, public expressions: Expression[]) {
+    export abstract class PostfixOperator {
+
+    }
+
+    export class Postfix implements Expression {
+        constructor(
+            public expression: Expression,
+            public operator: PostfixOperator) {
+        }
+    }
+
+    export class MethodCall implements PostfixOperator {
+        constructor(public args: Expression[]) {
+        }
+    }
+
+    export class Increment implements PostfixOperator {
+        constructor() {
         }
     }
 
