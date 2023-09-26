@@ -27,6 +27,15 @@ export namespace AstToIr {
     import Type = ExpressionAst.Type;
     import LocalType = ExpressionAst.LocalType;
     import Namespace = DeclarationAst.Namespace;
+    import Postfix = ExpressionAst.Postfix;
+    import PostfixOperator = ExpressionAst.PostfixOperator;
+    import MethodCall = ExpressionAst.MethodCall;
+    import Increment = ExpressionAst.Increment;
+    import Decrement = ExpressionAst.Decrement;
+    import Variable = ExpressionAst.Variable;
+    import StringLiteral = ExpressionAst.StringLiteral;
+    import Lambda = DeclarationAst.Lambda;
+    import NewClassInstance = ExpressionAst.NewClassInstance;
 
 
     interface IrState {
@@ -53,7 +62,7 @@ export namespace AstToIr {
             case LocalType:
                 return new StatementIr.LocalType((type as LocalType).name)
             default:
-                throw new Error("Type not found: " + type)
+                throw new Error("Type not found: " + type.constructor)
         }
 
     }
@@ -75,7 +84,7 @@ export namespace AstToIr {
             case RefLocal:
                 return new StatementIr.LocalType((ref as RefLocal).name)
             default:
-                throw new Error("Ref not found: " + ref)
+                throw new Error("Ref not found: " + ref.constructor)
         }
     }
 
@@ -102,7 +111,7 @@ export namespace AstToIr {
             case Namespace:
                 return namespaceToIr(statement as Namespace, irState)
             default:
-                throw new Error("Unknown statement: " + JSON.stringify(statement))
+                throw new Error("Unknown statement: " + statement.constructor)
         }
     }
 
@@ -116,8 +125,18 @@ export namespace AstToIr {
                 return intConstToIr(expression as IntConst, irState)
             case ABinary:
                 return aBinaryToIr(expression as ABinary, irState)
+            case Postfix:
+                return postfixToIr(expression as Postfix, irState)
+            case Variable:
+                return variableToIr(expression as Variable, irState)
+            case StringLiteral:
+                return stringLiteralToIr(expression as StringLiteral, irState)
+            case Lambda:
+                return lambdaToIr(expression as Lambda, irState)
+            case NewClassInstance:
+                return  newClassInstanceToIr(expression as NewClassInstance, irState)
             default:
-                throw new Error("Unknown expression: " + JSON.stringify(expression))
+                throw new Error("Unknown expression: " + expression.constructor)
         }
     }
 
@@ -127,6 +146,40 @@ export namespace AstToIr {
 
     function aBinaryToIr(aBinary: ABinary, irState: IrState): ExpressionIr.ABinary {
         return new ExpressionIr.ABinary(opToIr(aBinary.op, irState), expressionToIr(aBinary.expression1, irState), expressionToIr(aBinary.expression2, irState))
+    }
+
+    function postfixToIr(postfix: Postfix, irState: IrState): ExpressionIr.Postfix {
+        return new ExpressionIr.Postfix(expressionToIr(postfix.expression, irState), postfixOperatorToIr(postfix.operator, irState))
+    }
+
+    function variableToIr(variable: Variable, irState: IrState): ExpressionIr.Variable {
+        return new ExpressionIr.Variable(variable.name)
+    }
+
+    function stringLiteralToIr(stringLiteral: StringLiteral, irState: IrState): ExpressionIr.StringLiteral {
+        return new ExpressionIr.StringLiteral(stringLiteral.value)
+    }
+
+    function lambdaToIr(lambda: Lambda, irState: IrState): ExpressionIr.Lambda {
+        return new ExpressionIr.Lambda(lambda.fields.map(field => fieldToIr(field, irState)), lambda.statements.map(statement => statementToIr(statement, irState)))
+    }
+
+    function newClassInstanceToIr(newClassInstance: NewClassInstance, irState: IrState): ExpressionIr.NewClassInstance {
+        return new ExpressionIr.NewClassInstance(typeToIr(newClassInstance.type, irState), newClassInstance.expressions.map(expression => expressionToIr(expression, irState)))
+    }
+
+
+    function postfixOperatorToIr(postfixOperator: PostfixOperator, irState: IrState): ExpressionIr.PostfixOperator {
+       switch (postfixOperator.constructor){
+           case MethodCall:
+               return new ExpressionIr.MethodCall((postfixOperator as MethodCall).args.map(expression => expressionToIr(expression, irState)))
+           case Increment:
+               return new ExpressionIr.Increment()
+           case Decrement:
+               return new ExpressionIr.Decrement()
+           default:
+               throw new Error("Postfix operator not found: " + postfixOperator.constructor)
+       }
     }
 
     function opToIr(operator: Operator, irState: IrState): ExpressionIr.Operator {
@@ -140,7 +193,7 @@ export namespace AstToIr {
             case Divide:
                 return new ExpressionIr.Divide()
             default:
-                throw new Error("Unknown operator: " + JSON.stringify(operator))
+                throw new Error("Unknown operator: " + operator.constructor)
         }
     }
 }

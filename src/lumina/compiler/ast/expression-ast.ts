@@ -1,3 +1,4 @@
+
 namespace ExpressionAst {
 
 
@@ -55,6 +56,7 @@ namespace ExpressionAst {
     export interface Expression {
     }
 
+
     export abstract class PostfixOperator {
 
     }
@@ -72,12 +74,13 @@ namespace ExpressionAst {
     }
 
     export class Increment implements PostfixOperator {
-        constructor() {
-        }
+    }
+
+    export class Decrement implements PostfixOperator {
     }
 
     export class NewClassInstance implements Expression {
-        constructor(public type: Type, public expression: Expression[]) {
+        constructor(public type: Type, public expressions: Expression[]) {
         }
     }
 

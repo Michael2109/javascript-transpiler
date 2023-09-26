@@ -134,6 +134,43 @@ function digit(): P<number> {
     return rep(capture(charIn("0-9")), {min: 1}).map(characters => +characters.join(""))
 }
 
+
+
+function charPred(predicate: (char: string) => boolean): P<string> {
+    return new P<string>((inputStream: InputStream) => {
+        const char = inputStream.peek()
+
+        if (char && predicate(char)) {
+
+                inputStream.next()
+                return {success: true, value: char,position: inputStream.position};
+
+        }
+        return {success: false, position: inputStream.position, disallowBacktrack: false, expected: []}
+    });
+}
+
+function charWhile(predicate: (char: string) => boolean): P<string> {
+    return new P<string>((inputStream: InputStream) => {
+
+        let result = ""
+        while(true) {
+            const char = inputStream.peek()
+
+            if (char && predicate(char)) {
+
+                inputStream.next()
+
+                result += char
+
+            } else {
+                return {success: true, value: result, position: inputStream.position};
+            }
+        }
+    });
+}
+
+
 function charIn(expected: string): P<void> {
     return new P<void>((inputStream: InputStream) => {
         const char = inputStream.peek()
@@ -372,5 +409,7 @@ export {
     opt,
     charIn,
     charsWhileIn,
-    spaces
+    spaces,
+    charPred,
+    charWhile
 }

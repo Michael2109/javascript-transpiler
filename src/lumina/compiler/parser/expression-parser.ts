@@ -1,4 +1,18 @@
-import {capture, cut, either, eitherMany, lazy, opt, P, rep, seq, spaces, str} from "../../parser/parser";
+import {
+    capture,
+    charIn,
+    charsWhileIn, charWhile,
+    cut,
+    either,
+    eitherMany,
+    lazy,
+    opt,
+    P,
+    rep,
+    seq,
+    spaces,
+    str
+} from "../../parser/parser";
 import {ExpressionAst} from "../ast/expression-ast"
 import {identifier, integer, keyword, variable} from "./lexical-parser";
 import Modifier = ExpressionAst.Modifier;
@@ -30,6 +44,10 @@ import Postfix = ExpressionAst.Postfix;
 import {Optional} from "../../parser/optional";
 import PostfixOperator = ExpressionAst.PostfixOperator;
 import Increment = ExpressionAst.Increment;
+import Decrement = ExpressionAst.Decrement;
+import StringLiteral = ExpressionAst.StringLiteral;
+import NewClassInstance = ExpressionAst.NewClassInstance;
+import LocalType = ExpressionAst.LocalType;
 
 function expressions(): P<Expression> {
     return postfix(booleanExpression());
@@ -37,13 +55,28 @@ function expressions(): P<Expression> {
 
 
 function expressionParser(): P<Expression> {
-    return lazy(() => postfix(eitherMany<Expression>(lambda(), range(), integer(), variable(), parenthesis())))
+    return lazy(() => postfix(eitherMany<Expression>(
+        newClassInstance(),
+        stringLiteral(),
+        lambda(),
+        range(),
+        integer(),
+        variable(),
+        parenthesis()))
+    )
 }
 
 function range(): P<Range> {
     return seq(integer(), str(".."), integer()).map(results => new Range(results[0], results[1]))
 }
 
+function stringLiteral(): P<StringLiteral> {
+    return seq(
+        cut(str("\"")),
+        charWhile(char => char !== "\""),
+        str("\""))
+        .map(result => new StringLiteral(result))
+}
 
 function modifier(): P<Modifier> {
     return eitherMany(
@@ -55,8 +88,24 @@ function modifier(): P<Modifier> {
     )
 }
 
+function newClassInstance(): P<NewClassInstance>{
+    return seq(
+        cut(str("new")),
+        spaces(true),
+        identifier(),
+        spaces(),
+        str("("),
+        rep(expressionParser(), {sep: seq(spaces(), str(","), spaces())}),
+        str(")")
+    ).map(results =>
+        new ExpressionAst.NewClassInstance(
+            new LocalType(results[0]),
+            results[1]
+        ))
+}
+
 function postfix(parser: P<Expression>): P<Expression> {
-    return seq(parser, opt(eitherMany(methodCall(), increment()))).map(results => {
+    return seq(parser, opt(eitherMany(methodCall(), increment(), decrement()))).map(results => {
             const postfixSection = results[1].get()
 
             if (postfixSection) {
@@ -86,6 +135,12 @@ function increment(): P<Increment> {
     return  capture(str("++"))
         .map(result => new Increment())
 }
+
+function decrement(): P<Decrement> {
+    return  capture(str("--"))
+        .map(result => new Decrement())
+}
+
 
 /**
  * Arithmetic
@@ -202,4 +257,4 @@ function parenthesis(): P<Expression> {
     ))
 }
 
-export {expressions, modifier, methodCall, expressionParser, multiply, divide, add, subtract, parenthesis, chain, booleanExpression, range}
+export {expressions, modifier, methodCall, expressionParser, multiply, divide, add, subtract, parenthesis, chain, booleanExpression, range, postfix}

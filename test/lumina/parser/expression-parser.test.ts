@@ -17,6 +17,10 @@ import Greater = ExpressionAst.Greater;
 import RBinary = ExpressionAst.RBinary;
 import Postfix = ExpressionAst.Postfix;
 import Variable = ExpressionAst.Variable;
+import Increment = ExpressionAst.Increment;
+import Decrement = ExpressionAst.Decrement;
+import NewClassInstance = ExpressionAst.NewClassInstance;
+import LocalType = ExpressionAst.LocalType;
 
 beforeAll(() => {
     global.console = require('console')
@@ -63,6 +67,27 @@ test('Parse access modifier', () => {
     assertSuccess(parse("private", modifier()), Private, 7)
     assertSuccess(parse("open", modifier()), Open, 4)
     assertFailure(parse("",modifier()), 0)
+});
+
+test('Parse increment', () => {
+    assertSuccess(parse("a++",expressionParser()), new Postfix(new Variable("a"),new Increment( )), 3)
+});
+
+test('Parse decrement', () => {
+    assertSuccess(parse("a--",expressionParser()), new Postfix(new Variable("a"),new Decrement( )), 3)
+});
+
+test('Parse new class instance', () => {
+    assertSuccess(parse("new ClassName()",expressionParser()), new NewClassInstance(new LocalType("ClassName"),[]), 15)
+    assertSuccess(parse("new ClassName(a, b, c)",expressionParser()),
+        new NewClassInstance(
+            new LocalType("ClassName"),
+            [
+                new Variable("a"),
+                new Variable("b"),
+                new Variable("c"),
+            ]
+        ), 22)
 });
 
 test('Parse method call', () => {

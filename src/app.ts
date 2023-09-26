@@ -71,7 +71,7 @@ const parseSuccess = parseResult as ParseSuccess<CompilationUnit>
     } else {
 
         const parseFailure = parseResult as ParseFailure<CompilationUnit>
-        throw new Error("Syntax error: " +parseFailure.position + " : "+ fileContent.slice( parseFailure.position))
+        throw new Error("Syntax error: `" +parseFailure.position + "` : `"+ fileContent.slice( parseFailure.position)) + "`"
     }
 })
 

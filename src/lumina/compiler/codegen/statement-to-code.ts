@@ -67,7 +67,7 @@ export namespace CodeGenerator {
         return ExpressionToCode.expressionToCode(exprAsStmt.expression)
     }
 
-    function statementToCode(statement: StatementIr.Statement): string {
+  export function statementToCode(statement: StatementIr.Statement): string {
         switch (statement.constructor) {
             case StatementIr.ClassModel:
                 return classToCode(statement as StatementIr.ClassModel)
