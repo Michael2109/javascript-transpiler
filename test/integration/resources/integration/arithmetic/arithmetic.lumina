@@ -1,1 +1,6 @@
-println("This is a test")
+println(1)
+println(1+2)
+println(1-2)
+println(10/5)
+println(10*5)
+println(1 + 2 * 5 - 10 / 2)
