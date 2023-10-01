@@ -36,6 +36,10 @@ function execute(filePath: string): Array<string> {
 
     let executeProcess = getProcess(command)
 
+    console.log(executeProcess.stdout)
+    console.log(executeProcess.error)
+    console.log(executeProcess.output)
+
     return executeProcess.stdout.toString().split(/\r?\n/)
 }
 
