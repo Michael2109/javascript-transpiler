@@ -21,7 +21,7 @@ function compileAndExecute(sourceDirectory: string, executableJsPath: string): A
     if(isWindows){
         compilerProcess  = spawnSync('cmd.exe', ["/c", command]);
     } else {
-        compilerProcess  = spawnSync( command);
+        compilerProcess  = spawnSync( 'bash',[command]);
     }
 
 
