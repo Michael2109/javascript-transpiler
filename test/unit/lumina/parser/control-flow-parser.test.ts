@@ -1,11 +1,11 @@
 import {assertSuccess} from "./parser-test-utils";
-import {DeclarationAst} from "../../../src/lumina/compiler/ast/declaration-ast";
+import {DeclarationAst} from "../../../../src/lumina/compiler/ast/declaration-ast";
 
-import {parse} from "../../../src/lumina/parser/parser";
-import {ControlFlowAst} from "../../../src/lumina/compiler/ast/control-flow-ast";
-import {doWhileLoop, forLoop, whileLoop} from "../../../src/lumina/compiler/parser/control-flow-parser";
-import {ExpressionAst} from "../../../src/lumina/compiler/ast/expression-ast";
-import {StatementAst} from "../../../src/lumina/compiler/ast/statement-ast";
+import {parse} from "../../../../src/lumina/parser/parser";
+import {ControlFlowAst} from "../../../../src/lumina/compiler/ast/control-flow-ast";
+import {doWhileLoop, forLoop, whileLoop} from "../../../../src/lumina/compiler/parser/control-flow-parser";
+import {ExpressionAst} from "../../../../src/lumina/compiler/ast/expression-ast";
+import {StatementAst} from "../../../../src/lumina/compiler/ast/statement-ast";
 import For = ControlFlowAst.For;
 import Variable = ExpressionAst.Variable;
 import Range = ExpressionAst.Range;

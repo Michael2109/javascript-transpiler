@@ -1,10 +1,10 @@
 import {assertSuccess} from "./parser-test-utils";
-import {compilationUnit} from "../../../src/lumina/compiler/parser/statement-parser";
-import {DeclarationAst} from "../../../src/lumina/compiler/ast/declaration-ast";
+import {compilationUnit} from "../../../../src/lumina/compiler/parser/statement-parser";
+import {DeclarationAst} from "../../../../src/lumina/compiler/ast/declaration-ast";
 import CompilationUnit = DeclarationAst.CompilationUnit;
 import Method = DeclarationAst.Method;
 
-import {parse} from "../../../src/lumina/parser/parser";
+import {parse} from "../../../../src/lumina/parser/parser";
 
 beforeAll(() => {
     global.console = require('console')

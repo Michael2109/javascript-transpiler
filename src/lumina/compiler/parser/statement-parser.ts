@@ -225,7 +225,6 @@ function reassign(): P<Reassign> {
     )
 }
 
-
 function expressionAsStatement(): P<ExprAsStmt> {
     return seq(spaces(), expressions(), spaces()).map(result => new ExprAsStmt(result))
 }

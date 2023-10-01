@@ -1,5 +1,5 @@
-import {ExpressionAst} from "../../../src/lumina/compiler/ast/expression-ast";
-import {StatementAst} from "../../../src/lumina/compiler/ast/statement-ast";
+import {ExpressionAst} from "../../../../src/lumina/compiler/ast/expression-ast";
+import {StatementAst} from "../../../../src/lumina/compiler/ast/statement-ast";
 
 import {assertFailure, assertSuccess} from "./parser-test-utils";
 import {
@@ -11,11 +11,11 @@ import {
     ifStatement,
     method,
     reassign
-} from "../../../src/lumina/compiler/parser/statement-parser";
-import {ControlFlowAst} from "../../../src/lumina/compiler/ast/control-flow-ast";
-import {DeclarationAst} from "../../../src/lumina/compiler/ast/declaration-ast";
+} from "../../../../src/lumina/compiler/parser/statement-parser";
+import {ControlFlowAst} from "../../../../src/lumina/compiler/ast/control-flow-ast";
+import {DeclarationAst} from "../../../../src/lumina/compiler/ast/declaration-ast";
 
-import {parse} from "../../../src/lumina/parser/parser";
+import {parse} from "../../../../src/lumina/parser/parser";
 import ExprAsStmt = StatementAst.ExprAsStmt;
 import Variable = ExpressionAst.Variable;
 import If = ControlFlowAst.If;
@@ -27,7 +27,7 @@ import ClassModel = DeclarationAst.ClassModel;
 import Assign = DeclarationAst.Assign;
 import Reassign = DeclarationAst.Reassign;
 import LocalType = ExpressionAst.LocalType;
-import {namespace} from "../../../src/lumina/compiler/parser/declaration-parser";
+import {namespace} from "../../../../src/lumina/compiler/parser/declaration-parser";
 import Namespace = DeclarationAst.Namespace;
 
 beforeAll(() => {

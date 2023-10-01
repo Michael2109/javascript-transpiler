@@ -48,6 +48,8 @@ import Decrement = ExpressionAst.Decrement;
 import StringLiteral = ExpressionAst.StringLiteral;
 import NewClassInstance = ExpressionAst.NewClassInstance;
 import LocalType = ExpressionAst.LocalType;
+import {DeclarationAst} from "../ast/declaration-ast";
+import Println = ExpressionAst.Println;
 
 function expressions(): P<Expression> {
     return postfix(booleanExpression());
@@ -57,6 +59,7 @@ function expressions(): P<Expression> {
 function expressionParser(): P<Expression> {
     return lazy(() => postfix(eitherMany<Expression>(
         newClassInstance(),
+        println(),
         stringLiteral(),
         lambda(),
         range(),
@@ -130,6 +133,19 @@ function methodCall(): P<MethodCall> {
             .map<MethodCall>(result => new MethodCall(result[1]))
     )
 }
+
+function println(): P<Println> {
+    return seq(
+        cut(keyword("println")),
+        spaces(),
+        str("("),
+        spaces(),
+        expressions(),
+        spaces(),
+        str(")")
+    ).map(results => new Println(results))
+}
+
 
 function increment(): P<Increment> {
     return  capture(str("++"))
@@ -257,4 +273,4 @@ function parenthesis(): P<Expression> {
     ))
 }
 
-export {expressions, modifier, methodCall, expressionParser, multiply, divide, add, subtract, parenthesis, chain, booleanExpression, range, postfix}
+export {println,expressions, modifier, methodCall, expressionParser, multiply, divide, add, subtract, parenthesis, chain, booleanExpression, range, postfix}

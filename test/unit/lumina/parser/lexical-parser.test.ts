@@ -4,13 +4,13 @@ import {
     keyword,
     stringLiteral,
     variable,
-} from "../../../src/lumina/compiler/parser/lexical-parser";
-import {parse} from "../../../src/lumina/parser/parser";
+} from "../../../../src/lumina/compiler/parser/lexical-parser";
+import {parse} from "../../../../src/lumina/parser/parser";
 import {assertFailure, assertSuccess} from "./parser-test-utils";
-import {ExpressionAst} from "../../../src/lumina/compiler/ast/expression-ast";
+import {ExpressionAst} from "../../../../src/lumina/compiler/ast/expression-ast";
 import IntConst = ExpressionAst.IntConst;
 import Variable = ExpressionAst.Variable;
-import {DeclarationAst} from "../../../src/lumina/compiler/ast/declaration-ast";
+import {DeclarationAst} from "../../../../src/lumina/compiler/ast/declaration-ast";
 import Reassign = DeclarationAst.Reassign;
 import ABinary = ExpressionAst.ABinary;
 import Add = ExpressionAst.Add;

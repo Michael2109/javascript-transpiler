@@ -11,6 +11,12 @@ namespace ExpressionIr {
         }
     }
 
+    export class Println implements Expression {
+        constructor(public expression: Expression) {
+        }
+    }
+
+
     export abstract class PostfixOperator {
 
     }

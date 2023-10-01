@@ -4,6 +4,7 @@ import {ExpressionIr} from "../ir/expression-ir";
 import {StatementIr} from "../ir/statement-ir";
 import {DeclarationAst} from "../ast/declaration-ast";
 import {DeclarationIr} from "../ir/declaration-ir";
+import exp from "constants";
 
 export namespace AstToIr {
 
@@ -36,6 +37,7 @@ export namespace AstToIr {
     import StringLiteral = ExpressionAst.StringLiteral;
     import Lambda = DeclarationAst.Lambda;
     import NewClassInstance = ExpressionAst.NewClassInstance;
+    import Println = ExpressionAst.Println;
 
 
     interface IrState {
@@ -135,6 +137,8 @@ export namespace AstToIr {
                 return lambdaToIr(expression as Lambda, irState)
             case NewClassInstance:
                 return  newClassInstanceToIr(expression as NewClassInstance, irState)
+            case Println:
+                return printlnToIr(expression as Println, irState)
             default:
                 throw new Error("Unknown expression: " + expression.constructor)
         }
@@ -167,7 +171,9 @@ export namespace AstToIr {
     function newClassInstanceToIr(newClassInstance: NewClassInstance, irState: IrState): ExpressionIr.NewClassInstance {
         return new ExpressionIr.NewClassInstance(typeToIr(newClassInstance.type, irState), newClassInstance.expressions.map(expression => expressionToIr(expression, irState)))
     }
-
+    function printlnToIr(println: Println, irState: IrState): ExpressionIr.Println {
+        return new ExpressionIr.Println(expressionToIr(println.expression, irState))
+    }
 
     function postfixOperatorToIr(postfixOperator: PostfixOperator, irState: IrState): ExpressionIr.PostfixOperator {
        switch (postfixOperator.constructor){

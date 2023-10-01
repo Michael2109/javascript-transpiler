@@ -85,7 +85,6 @@ namespace DeclarationAst {
                     public statement: Statement) {
         }
     }
-
 }
 
 export {DeclarationAst}

@@ -3,6 +3,7 @@ import {DeclarationIr} from "../ir/declaration-ir";
 import {CodeGenerator} from "./statement-to-code";
 import {str} from "../../parser/parser";
 import {StatementIr} from "../ir/statement-ir";
+import exp from "constants";
 
 namespace ExpressionToCode {
 
@@ -26,6 +27,8 @@ namespace ExpressionToCode {
                 return lambdaToCode(expression as ExpressionIr.Lambda)
             case ExpressionIr.NewClassInstance:
                 return  newClassInstanceToCode(expression as ExpressionIr.NewClassInstance)
+            case ExpressionIr.Println:
+                return printlnToCode(expression as ExpressionIr.Println)
             default:
                 throw new Error("Not found: " + JSON.stringify(expression))
         }
@@ -77,6 +80,10 @@ namespace ExpressionToCode {
 
     function newClassInstanceToCode(newClassInstance: ExpressionIr.NewClassInstance): string {
         return "new " + typeToCode(newClassInstance.type) + "(" + newClassInstance.expressions.map(expressionToCode).join(",") +  ")"
+    }
+
+    function printlnToCode(println: ExpressionIr.Println): string {
+        return "console.log( " + expressionToCode(println.expression) +  ")"
     }
 
     function typeToCode(type: StatementIr.Type): string {

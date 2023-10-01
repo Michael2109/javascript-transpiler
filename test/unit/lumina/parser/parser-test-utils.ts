@@ -1,4 +1,4 @@
-import {ParseResult, ParseSuccess} from "../../../src/lumina/parser/parser";
+import {ParseResult, ParseSuccess} from "../../../../src/lumina/parser/parser";
 
 function assertSuccess<T>(parseResult: ParseResult<T>, expectedValue: T, expectedPosition: number) {
     console.log(parseResult)

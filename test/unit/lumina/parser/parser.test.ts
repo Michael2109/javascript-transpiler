@@ -13,10 +13,10 @@ import {
     seq,
     spaces,
     str
-} from "../../../src/lumina/parser/parser";
+} from "../../../../src/lumina/parser/parser";
 import {assertFailure, assertSuccess} from "./parser-test-utils";
 
-import {Optional} from "../../../src/lumina/parser/optional";
+import {Optional} from "../../../../src/lumina/parser/optional";
 
 beforeAll(() => {
     global.console = require('console')

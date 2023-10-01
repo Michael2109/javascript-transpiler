@@ -6,8 +6,9 @@
   "scripts": {
     "start": "npx tsc && node dist/app.js",
     "build": "tsc",
-    "test": "npx tsc && jest",
-    "compile": "npx tsc && npm install -g . && lumina"
+    "install-compiler": "npx tsc && npm install -g .",
+    "test:unit": "npx tsc && jest --testPathPattern=test/unit",
+    "test:integration": "npm run install-compiler && jest --testPathPattern=test/integration"
   },
   "bin": {
     "lumina": "dist/app.js"
@@ -25,6 +26,7 @@
   "dependencies": {
     "@types/js-beautify": "^1.14.0",
     "js-beautify": "^1.14.9",
+    "node-run-cmd": "^1.0.1",
     "ts-node": "^10.9.1"
   }
 }
