@@ -1,4 +1,5 @@
-import {spawnSync} from "child_process";
+import {spawnSync, SpawnSyncReturns} from "child_process";
+import * as Process from "process";
 
 const os = require('os');
 const fs = require('fs');
@@ -13,17 +14,7 @@ function compileAndExecute(sourceDirectory: string, executableJsPath: string): A
 
     const command = `lumina --source ${sourceDirectory} --target ${tmpDir}`;
 
-    console.log("Running")
-
-    const isWindows = process.platform === "win32"
-
-    let compilerProcess
-    if(isWindows){
-        compilerProcess  = spawnSync('cmd.exe', ["/c", command]);
-    } else {
-        compilerProcess  = spawnSync( 'bash',[command]);
-    }
-
+    let compilerProcess = getProcess(command)
 
     if (compilerProcess.error) {
 
@@ -43,9 +34,19 @@ function execute(filePath: string): Array<string> {
 
     const command = "node " + filePath
 
-    const process = spawnSync('cmd.exe', ["/c", command]);
+    let executeProcess = getProcess(command)
 
-    return process.stdout.toString().split(/\r?\n/)
+    return executeProcess.stdout.toString().split(/\r?\n/)
+}
+
+function getProcess(command: string): SpawnSyncReturns<Buffer> {
+
+    const isWindows = process.platform === "win32"
+    if(isWindows){
+        return  spawnSync('cmd.exe', ["/c", command]);
+    } else {
+        return  spawnSync( 'bash',[command]);
+    }
 }
 
 function deleteDir(directory: string): void {
