@@ -45,7 +45,7 @@ function getProcess(command: string): SpawnSyncReturns<Buffer> {
     if(isWindows){
         return  spawnSync('cmd.exe', ["/c", command]);
     } else {
-        return  spawnSync( command);
+        return  spawnSync( command, [],  {shell: true});
     }
 }
 
