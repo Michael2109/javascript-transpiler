@@ -1,31 +1,46 @@
 import {StatementIr} from "../ir/statement-ir";
 import {ExpressionToCode} from "./expression-to-code";
 import {DeclarationIr} from "../ir/declaration-ir";
+import {ControlFlowIr} from "../ir/control-flow-ir";
 
 export namespace CodeGenerator {
 
 
     import LocalType = StatementIr.LocalType;
 
-    export function compilationUnitToCode(compilationUnit: StatementIr.CompilationUnit): string {
-        return compilationUnit.statements.map(statementToCode).join(" \n")
+    /**
+     * Joins a list of statements with an explicit `;` so that generated code never
+     * depends on automatic semicolon insertion.
+     */
+    export function statementsToCode(statements: Array<StatementIr.Statement>): string {
+        return statements.map(statementToCode).join(";\n")
     }
 
-    function namespaceToCode(namespace: DeclarationIr.Namespace): string {
+    export function compilationUnitToCode(compilationUnit: StatementIr.CompilationUnit): string {
+        return statementsToCode(compilationUnit.statements)
+    }
 
-        return `export namespace ${namespace.name} {` +namespace.statements.map(statementToCode) + "}"
+    function blockToCode(block: StatementIr.Block): string {
+        return "{" + statementsToCode(block.statements) + "}"
+    }
+
+    function ifToCode(ifStatement: ControlFlowIr.If): string {
+
+        const condition = ExpressionToCode.expressionToCode(ifStatement.condition)
+
+        const elseBranch = ifStatement.elseBlock ? ` else ${statementToCode(ifStatement.elseBlock)}` : ""
+
+        return `if(${condition})${statementToCode(ifStatement.ifBlock)}${elseBranch}`
     }
 
 
     function classToCode(classModel: StatementIr.ClassModel): string {
 
-        const createConstructor = classModel.fields.length > 0
-
         const parent = classModel.parent ? `extends ${typeToCode(classModel.parent)}` : ""
 
-        const constructor = "constructor(" + classModel.fields.map(classFieldToCode) + "){}"
+        const constructor = "constructor(" + classModel.fields.map(classFieldToCode).join(",") + "){}"
 
-        return `export class ${classModel.name} ${parent} {` + constructor + classModel.statements.map(statementToCode) + "}"
+        return `export class ${classModel.name} ${parent} {` + constructor + statementsToCode(classModel.statements) + "}"
     }
 
     function typeToCode(type: StatementIr.Type): string {
@@ -52,11 +67,11 @@ export namespace CodeGenerator {
      * @private
      */
     function moduleMethodToCode(method: StatementIr.ModuleMethod): string {
-        return `function ${method.name}(){` + method.statements.map(statementToCode) + "}"
+        return `function ${method.name}(){` + statementsToCode(method.statements) + "}"
     }
 
     function methodToCode(method: StatementIr.Method): string {
-        return `${method.name}(){` + method.statements.map(statementToCode) + "}"
+        return `${method.name}(){` + statementsToCode(method.statements) + "}"
     }
 
     function assignToCode(assign: StatementIr.Assign): string {
@@ -79,8 +94,10 @@ export namespace CodeGenerator {
                 return assignToCode(statement as StatementIr.Assign)
             case StatementIr.ExprAsStmt:
                 return exprAsStmtToCode(statement as StatementIr.ExprAsStmt)
-            case DeclarationIr.Namespace:
-                return namespaceToCode(statement as DeclarationIr.Namespace)
+            case StatementIr.Block:
+                return blockToCode(statement as StatementIr.Block)
+            case ControlFlowIr.If:
+                return ifToCode(statement as ControlFlowIr.If)
             default:
                 throw new Error("Not found: " + JSON.stringify(statement))
         }

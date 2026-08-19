@@ -1,10 +1,7 @@
-namespace StatementAst {
+class Statement
 
-    class Statement
-
-    class Return extends Statement
-    class ExprAsStmt(expression: Expression) extends Statement
-}
+class Return extends Statement
+class ExprAsStmt(expression: Expression) extends Statement
 
 test("Parse decrement", () => {
     assertSuccess(parse("a--",expressionParser()), new Postfix(new Variable("a"),new Decrement()), 3)

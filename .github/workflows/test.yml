@@ -29,4 +29,5 @@ jobs:
     - run: npm install
     - run: npm run build
     - run: npm run test:unit
-    - run: sudo npm run test:integration
+    - run: npm run test:corpus
+    - run: npm run test:cli

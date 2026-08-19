@@ -10,11 +10,10 @@ import {
     P,
     rep,
     seq,
-    spaces,
     str
 } from "../../parser/parser";
 import {ExpressionAst} from "../ast/expression-ast"
-import {identifier, integer, keyword, variable} from "./lexical-parser";
+import {identifier, integer, keyword, spaces, variable} from "./lexical-parser";
 import Modifier = ExpressionAst.Modifier;
 import Public = ExpressionAst.Public;
 import Protected = ExpressionAst.Protected;
@@ -31,6 +30,8 @@ import ABinOp = ExpressionAst.ABinOp;
 import ABinary = ExpressionAst.ABinary;
 import RBinOp = ExpressionAst.RBinOp;
 import RBinary = ExpressionAst.RBinary;
+import BBinOp = ExpressionAst.BBinOp;
+import BBinary = ExpressionAst.BBinary;
 import Operator = ExpressionAst.Operator;
 import And = ExpressionAst.And;
 import Or = ExpressionAst.Or;
@@ -186,6 +187,8 @@ function chain(parser1: P<Expression>, operatorParser1: P<Operator>, operatorPar
                         r = new ABinary(operator, expression, rhsResults[1])
                     } else if (operator instanceof RBinOp) {
                         r = new RBinary(operator, expression, rhsResults[1])
+                    } else if (operator instanceof BBinOp) {
+                        r = new BBinary(operator, expression, rhsResults[1])
                     } else {
                         throw new Error("Unknown operator: " + operator)
                     }

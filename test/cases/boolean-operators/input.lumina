@@ -1,0 +1,14 @@
+let a = 5
+let b = 10
+
+if(a < b && b > 1){
+    println("and")
+}
+
+if(a > 100 || b > 1){
+    println("or")
+}
+
+if(a <= 5 && b >= 10){
+    println("inclusive")
+}

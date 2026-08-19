@@ -4,7 +4,8 @@ import {ExpressionIr} from "../ir/expression-ir";
 import {StatementIr} from "../ir/statement-ir";
 import {DeclarationAst} from "../ast/declaration-ast";
 import {DeclarationIr} from "../ir/declaration-ir";
-import exp from "constants";
+import {ControlFlowAst} from "../ast/control-flow-ast";
+import {ControlFlowIr} from "../ir/control-flow-ir";
 
 export namespace AstToIr {
 
@@ -27,7 +28,6 @@ export namespace AstToIr {
     import Ref = ExpressionAst.Type;
     import Type = ExpressionAst.Type;
     import LocalType = ExpressionAst.LocalType;
-    import Namespace = DeclarationAst.Namespace;
     import Postfix = ExpressionAst.Postfix;
     import PostfixOperator = ExpressionAst.PostfixOperator;
     import MethodCall = ExpressionAst.MethodCall;
@@ -38,6 +38,17 @@ export namespace AstToIr {
     import Lambda = DeclarationAst.Lambda;
     import NewClassInstance = ExpressionAst.NewClassInstance;
     import Println = ExpressionAst.Println;
+    import If = ControlFlowAst.If;
+    import Block = StatementAst.Block;
+    import RBinary = ExpressionAst.RBinary;
+    import BBinary = ExpressionAst.BBinary;
+    import Greater = ExpressionAst.Greater;
+    import GreaterEqual = ExpressionAst.GreaterEqual;
+    import Less = ExpressionAst.Less;
+    import LessEqual = ExpressionAst.LessEqual;
+    import Equal = ExpressionAst.Equal;
+    import And = ExpressionAst.And;
+    import Or = ExpressionAst.Or;
 
 
     interface IrState {
@@ -48,8 +59,13 @@ export namespace AstToIr {
         return new StatementIr.CompilationUnit(compilationUnit.statements.map(s => statementToIr(s, {isModule: true})))
     }
 
-    function namespaceToIr(namespace: Namespace, irState: IrState): DeclarationIr.Namespace {
-        return new DeclarationIr.Namespace(namespace.name, namespace.statements.map(statement => statementToIr(statement, irState)))
+    function ifStatementToIr(ifStatement: If, irState: IrState): ControlFlowIr.If {
+        const elseBlock = ifStatement.elseBlock ? statementToIr(ifStatement.elseBlock, irState) : undefined
+        return new ControlFlowIr.If(expressionToIr(ifStatement.condition, irState), statementToIr(ifStatement.ifBlock, irState), elseBlock)
+    }
+
+    function blockToIr(block: Block, irState: IrState): StatementIr.Block {
+        return new StatementIr.Block( block.statements.map(statement => statementToIr(statement, irState)))
     }
 
     function classToIr(classModel: ClassModel, irState: IrState): StatementIr.ClassModel {
@@ -110,8 +126,10 @@ export namespace AstToIr {
                 return assignToIr(statement as Assign, irState)
             case ExprAsStmt:
                 return exprAsStmtToIr(statement as ExprAsStmt, irState)
-            case Namespace:
-                return namespaceToIr(statement as Namespace, irState)
+            case If:
+                return ifStatementToIr(statement as If, irState)
+            case Block:
+                return blockToIr(statement as Block, irState)
             default:
                 throw new Error("Unknown statement: " + statement.constructor)
         }
@@ -127,6 +145,10 @@ export namespace AstToIr {
                 return intConstToIr(expression as IntConst, irState)
             case ABinary:
                 return aBinaryToIr(expression as ABinary, irState)
+            case RBinary:
+                return rBinaryToIr(expression as RBinary, irState)
+            case BBinary:
+                return bBinaryToIr(expression as BBinary, irState)
             case Postfix:
                 return postfixToIr(expression as Postfix, irState)
             case Variable:
@@ -150,6 +172,14 @@ export namespace AstToIr {
 
     function aBinaryToIr(aBinary: ABinary, irState: IrState): ExpressionIr.ABinary {
         return new ExpressionIr.ABinary(opToIr(aBinary.op, irState), expressionToIr(aBinary.expression1, irState), expressionToIr(aBinary.expression2, irState))
+    }
+
+    function rBinaryToIr(rBinary: RBinary, irState: IrState): ExpressionIr.RBinary {
+        return new ExpressionIr.RBinary(opToIr(rBinary.op, irState) as ExpressionIr.RBinOp, expressionToIr(rBinary.expression1, irState), expressionToIr(rBinary.expression2, irState))
+    }
+
+    function bBinaryToIr(bBinary: BBinary, irState: IrState): ExpressionIr.BBinary {
+        return new ExpressionIr.BBinary(opToIr(bBinary.op, irState) as ExpressionIr.BBinOp, expressionToIr(bBinary.expression1, irState), expressionToIr(bBinary.expression2, irState))
     }
 
     function postfixToIr(postfix: Postfix, irState: IrState): ExpressionIr.Postfix {
@@ -198,6 +228,20 @@ export namespace AstToIr {
                 return new ExpressionIr.Multiply()
             case Divide:
                 return new ExpressionIr.Divide()
+            case Greater:
+                return new ExpressionIr.Greater()
+            case GreaterEqual:
+                return new ExpressionIr.GreaterEqual()
+            case Less:
+                return new ExpressionIr.Less()
+            case LessEqual:
+                return new ExpressionIr.LessEqual()
+            case Equal:
+                return new ExpressionIr.Equal()
+            case And:
+                return new ExpressionIr.And()
+            case Or:
+                return new ExpressionIr.Or()
             default:
                 throw new Error("Unknown operator: " + operator.constructor)
         }

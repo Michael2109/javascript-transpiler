@@ -1,35 +1,32 @@
-namespace ExpressionAst {
+class Import (loc: Array[string])
 
-    class Import (loc: Array[string])
+class Field (name: string, ref: Ref, init?: Expression)
 
-    class Field (name: string, ref: Ref, init?: Expression)
+class Type
 
-    class Type
+class LocalType (name: string) extends Type
 
-    class LocalType (name: string) extends Type
+class Super
 
-    class Super
+class This
 
-    class This
+class NameSpace (nameSpace: Array[string])
 
-    class NameSpace (nameSpace: Array[string])
+class QualifiedName (value: string)
 
-    class QualifiedName (value: string)
+class Annotation (name: string)
 
-    class Annotation (name: string)
+class Modifier
 
-    class Modifier
+class Public extends Modifier
+class Protected extends Modifier
+class Private extends Modifier
+class PackageLocal extends Modifier
+class Abstract extends Modifier
+class Open extends Modifier
+class Pure extends Modifier
 
-    class Public extends Modifier
-    class Protected extends Modifier
-    class Private extends Modifier
-    class PackageLocal extends Modifier
-    class Abstract extends Modifier
-    class Open extends Modifier
-    class Pure extends Modifier
-
-    class Expression
-    class MethodCall (name: string, expressions: Array[Expression]) extends Expression
-    class NewClassInstance (type: Type, expressions: Array[Expression]) extends Expression
-    class StringLiteral (value: string)  extends Expression
-}
+class Expression
+class MethodCall (name: string, expressions: Array[Expression]) extends Expression
+class NewClassInstance (type: Type, expressions: Array[Expression]) extends Expression
+class StringLiteral (value: string)  extends Expression

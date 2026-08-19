@@ -5,10 +5,14 @@
   "main": "dist/app.js",
   "scripts": {
     "start": "npx tsc && node dist/app.js",
-    "build": "tsc",
+    "clean": "node scripts/clean.js",
+    "build": "npm run clean && tsc",
     "install-compiler": "npx tsc && npm install -g .",
-    "test:unit": "npx tsc && jest --testPathPattern=test/unit",
-    "test:integration": "npm run install-compiler && jest --testPathPattern=test/integration"
+    "test": "npm run build && jest",
+    "test:unit": "jest --testPathPattern=test/unit",
+    "test:corpus": "jest --testPathPattern=test/corpus/corpus",
+    "test:cli": "npm run build && jest --testPathPattern=test/corpus/cli",
+    "test:update": "node scripts/update-goldens.js"
   },
   "bin": {
     "lumina": "dist/app.js"

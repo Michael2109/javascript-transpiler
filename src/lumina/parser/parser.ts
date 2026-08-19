@@ -6,7 +6,47 @@ const DIGIT_REGEX: RegExp = new RegExp(`^[0-9]+`);
 type Parser<T> = (inputStream: InputStream) => ParseResult<T>
 
 export function parse <T> (input: string, p: P<T>): ParseResult<T>{
-    return  p.createParser(new InputStream(input))
+
+    const inputStream = new InputStream(input)
+    const parseResult = p.createParser(inputStream)
+
+    if (parseResult.success) {
+        return parseResult
+    }
+
+    // Report the deepest position reached across every alternative, not wherever
+    // the outermost parser happened to give up after backtracking.
+    const parseFailure = parseResult as ParseFailure<T>
+
+    return {
+        success: false,
+        position: Math.max(inputStream.furthestFailurePosition, parseFailure.position),
+        expected: inputStream.furthestExpected,
+        disallowBacktrack: parseFailure.disallowBacktrack
+    } as ParseFailure<T>
+}
+
+/**
+ * Renders a parse failure for a human.
+ *
+ * Shared so the CLI and the test harness cannot drift apart. Line and column
+ * reporting slots in here once InputStream tracks them.
+ */
+export function describeFailure<T>(parseFailure: ParseFailure<T>): string {
+
+    const candidates = parseFailure.expected ?? []
+
+    if (candidates.length === 0) {
+        return `Syntax error at position ${parseFailure.position}`
+    }
+
+    // A long expected set is noise rather than help; show the first few.
+    const MAX_REPORTED = 6
+
+    const shown = candidates.slice(0, MAX_REPORTED).join(" or ")
+    const rest = candidates.length > MAX_REPORTED ? `, or ${candidates.length - MAX_REPORTED} more` : ""
+
+    return `Syntax error at position ${parseFailure.position}: expected ${shown}${rest}`
 }
 
 class P<T> {
@@ -81,16 +121,21 @@ function str(expected: string): P<void> {
 
     return new P<void>((inputStream: InputStream) => {
 
+        const startPosition = inputStream.position
+
         for (let expectedChar of expected) {
             if (inputStream.peek() !== expectedChar) {
 
-                const tempPosition = inputStream.position
+                // A partial match must give back everything it consumed, or the
+                // stream is left inside a half-recognised token.
+                inputStream.position = startPosition
+                inputStream.recordFailure(startPosition, [`"${expected}"`])
 
                 return {
                     success: false,
                     disallowBacktrack: false,
-                    expected: [],
-                    position: tempPosition
+                    expected: [expected],
+                    position: startPosition
                 }
             }
             inputStream.next()
@@ -183,7 +228,8 @@ function charIn(expected: string): P<void> {
                 return {success: true, value: undefined, stringValue: char, position: inputStream.position};
             }
         }
-        return {success: false, position: inputStream.position, disallowBacktrack: false, expected: []}
+        inputStream.recordFailure(inputStream.position, [`[${expected}]`])
+        return {success: false, position: inputStream.position, disallowBacktrack: false, expected: [expected]}
     });
 }
 
@@ -210,11 +256,11 @@ function charsWhileIn(characters: string): P<void> {
 
 function spaces(required?: boolean): P<void> {
     if(required) {
-        return capture(charsWhileIn(" \r\n\t"))
+        return quiet(capture(charsWhileIn(" \r\n\t"))
             .filter(chars => chars.length > 0)
-            .map(() => undefined)
+            .map(() => undefined))
     } else {
-        return charsWhileIn(" \r\n\t")
+        return quiet(charsWhileIn(" \r\n\t"))
     }
 }
 
@@ -232,6 +278,10 @@ function rep<T>(parser: P<T>, options: {
 
         let occurrences = 0;
 
+        // The end of the last complete element, excluding any separator that
+        // followed it. Everything past this is given back when iteration stops.
+        let lastCompletePosition = inputStream.position
+
         while (true) {
             const parseResult = parser.createParser(inputStream)
             if (parseResult.success) {
@@ -239,14 +289,20 @@ function rep<T>(parser: P<T>, options: {
                 results.push(parseSuccess.value)
 
                 occurrences++;
+                lastCompletePosition = inputStream.position
+
                 if (sep !== undefined) {
                     // Parse separator - If fails, break
                     const sepParseResult = sep.createParser(inputStream);
                     if (!sepParseResult.success) {
+                        inputStream.position = lastCompletePosition
                         break;
                     }
                 }
             } else {
+                // Rewind past the failed element and any separator that preceded
+                // it, so a trailing separator is not silently swallowed.
+                inputStream.position = lastCompletePosition
                 break;
             }
         }
@@ -261,12 +317,50 @@ function rep<T>(parser: P<T>, options: {
     })
 }
 
+/**
+ * Consumes everything up to and including the first occurrence of `marker`.
+ * Fails, consuming nothing, if the marker never appears.
+ */
+function until(marker: string): P<void> {
+    return new P<void>((inputStream: InputStream) => {
+
+        const startPosition = inputStream.position
+
+        while (!inputStream.isEmpty()) {
+
+            const attemptPosition = inputStream.position
+
+            let matched = true
+            for (const markerChar of marker) {
+                if (inputStream.peek() !== markerChar) {
+                    matched = false
+                    break
+                }
+                inputStream.next()
+            }
+
+            if (matched) {
+                return {success: true, value: undefined, position: inputStream.position}
+            }
+
+            inputStream.position = attemptPosition
+            inputStream.next()
+        }
+
+        inputStream.position = startPosition
+        inputStream.recordFailure(startPosition, [`"${marker}"`])
+
+        return {success: false, position: startPosition, disallowBacktrack: false, expected: [marker]}
+    })
+}
+
 function end(): P<void> {
     return new P<void>((inputStream: InputStream) => {
         if (inputStream.isEmpty()) {
             return {success: true, value: undefined, position: inputStream.position};
         }
-        return {success: false, position: inputStream.position, disallowBacktrack: false, expected: []}
+        inputStream.recordFailure(inputStream.position, ["end of input"])
+        return {success: false, position: inputStream.position, disallowBacktrack: false, expected: ["end of input"]}
     });
 }
 
@@ -317,12 +411,17 @@ function opt<T>(parser: P<T>): P<Optional<T>> {
 
     return new P<Optional<T>>((inputStream: InputStream) => {
 
+        const startPosition = inputStream.position
+
         const parseResult = parser.createParser(inputStream);
         if (parseResult.success) {
             const parseSuccess = parseResult as ParseSuccess<T>
             return {success: true, value: new Optional(parseSuccess.value), position: parseSuccess.position};
         }
-        return {success: true, value: new Optional(undefined), position: inputStream.position}
+
+        // Absent, not partially present — rewind whatever the attempt consumed.
+        inputStream.position = startPosition
+        return {success: true, value: new Optional(undefined), position: startPosition}
     })
 }
 
@@ -386,6 +485,48 @@ function eitherMany<T>(...parsers: Array<P<T>>): P<T> {
     })
 }
 
+/**
+ * Runs a parser without recording any of its failures. For parsers whose
+ * internals are never worth reporting, such as whitespace.
+ */
+function quiet<T>(parser: P<T>): P<T> {
+    return new P<T>((inputStream: InputStream) => {
+        inputStream.suppressDepth++
+        try {
+            return parser.createParser(inputStream)
+        } finally {
+            inputStream.suppressDepth--
+        }
+    })
+}
+
+/**
+ * Replaces everything a parser would contribute to the expected set with a
+ * single name, reported at the position the parser started from.
+ *
+ * `identifier()` should say "identifier", not "[a-z] or [A-Z] or _".
+ */
+function label<T>(name: string, parser: P<T>): P<T> {
+    return new P<T>((inputStream: InputStream) => {
+
+        const startPosition = inputStream.position
+
+        inputStream.suppressDepth++
+        let parseResult: ParseResult<T>
+        try {
+            parseResult = parser.createParser(inputStream)
+        } finally {
+            inputStream.suppressDepth--
+        }
+
+        if (!parseResult.success) {
+            inputStream.recordFailure(startPosition, [name])
+        }
+
+        return parseResult
+    })
+}
+
 function lazy<T>(parserFunction: () => P<T>): P<T> {
     return new P<T>((inputStream: InputStream) => {
         return parserFunction().createParser(inputStream)
@@ -397,6 +538,9 @@ export {
     P,
     ParseResult,
    lazy,
+    quiet,
+    label,
+    until,
     capture,
     either,
     eitherMany,

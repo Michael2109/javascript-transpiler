@@ -1,9 +1,7 @@
 import {ExpressionIr} from "../ir/expression-ir";
 import {DeclarationIr} from "../ir/declaration-ir";
 import {CodeGenerator} from "./statement-to-code";
-import {str} from "../../parser/parser";
 import {StatementIr} from "../ir/statement-ir";
-import exp from "constants";
 
 namespace ExpressionToCode {
 
@@ -17,6 +15,10 @@ namespace ExpressionToCode {
                 return intConstToCode(expression as ExpressionIr.IntConst)
             case ExpressionIr.ABinary:
                 return aBinaryToCode(expression as ExpressionIr.ABinary)
+            case ExpressionIr.RBinary:
+                return rBinaryToCode(expression as ExpressionIr.RBinary)
+            case ExpressionIr.BBinary:
+                return bBinaryToCode(expression as ExpressionIr.BBinary)
             case ExpressionIr.Postfix:
                 return postfixToCode(expression as ExpressionIr.Postfix)
             case ExpressionIr.Variable:
@@ -34,8 +36,24 @@ namespace ExpressionToCode {
         }
     }
 
+    /**
+     * Grouping is not preserved in the AST, so every binary operation is wrapped in
+     * parentheses to keep the source's precedence in the generated code.
+     */
+    function binaryToCode(op: ExpressionIr.Operator, expression1: ExpressionIr.Expression, expression2: ExpressionIr.Expression): string {
+        return "(" + expressionToCode(expression1) + opToCode(op) + expressionToCode(expression2) + ")"
+    }
+
     export function aBinaryToCode(aBinary: ExpressionIr.ABinary): string {
-        return expressionToCode(aBinary.expression1) + opToCode(aBinary.op) + expressionToCode(aBinary.expression2)
+        return binaryToCode(aBinary.op, aBinary.expression1, aBinary.expression2)
+    }
+
+    function rBinaryToCode(rBinary: ExpressionIr.RBinary): string {
+        return binaryToCode(rBinary.op, rBinary.expression1, rBinary.expression2)
+    }
+
+    function bBinaryToCode(bBinary: ExpressionIr.BBinary): string {
+        return binaryToCode(bBinary.op, bBinary.expression1, bBinary.expression2)
     }
 
     export function opToCode(operator: ExpressionIr.Operator): string {
@@ -48,6 +66,20 @@ namespace ExpressionToCode {
                 return "*"
             case ExpressionIr.Divide:
                 return "/"
+            case ExpressionIr.Greater:
+                return ">"
+            case ExpressionIr.GreaterEqual:
+                return ">="
+            case ExpressionIr.Less:
+                return "<"
+            case ExpressionIr.LessEqual:
+                return "<="
+            case ExpressionIr.Equal:
+                return "==="
+            case ExpressionIr.And:
+                return "&&"
+            case ExpressionIr.Or:
+                return "||"
             default:
                 throw new Error("Unknown operator: " + operator)
         }
@@ -71,7 +103,7 @@ namespace ExpressionToCode {
     }
 
     function lambdaToCode(lambda: ExpressionIr.Lambda): string {
-        return "("+ lambda.fields.map(fieldToCode) + ")=>{" + lambda.statements.map(CodeGenerator.statementToCode)  + "}"
+        return "(" + lambda.fields.map(fieldToCode).join(",") + ")=>{" + CodeGenerator.statementsToCode(lambda.statements) + "}"
     }
 
     function fieldToCode(field: DeclarationIr.Field): string {
@@ -98,7 +130,7 @@ namespace ExpressionToCode {
     function postfixOperatorToCode(postfixOperator: ExpressionIr.PostfixOperator): string {
         switch (postfixOperator.constructor){
             case  ExpressionIr.MethodCall:
-                return "(" + (postfixOperator as ExpressionIr.MethodCall).args.map(expressionToCode) + ")"
+                return "(" + (postfixOperator as ExpressionIr.MethodCall).args.map(expressionToCode).join(",") + ")"
             case  ExpressionIr.Increment:
                 return "++"
             case  ExpressionIr.Decrement:

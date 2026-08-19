@@ -1,0 +1,9 @@
+let x = 3
+
+if(x > 5){
+    println("big")
+} else if(x > 2){
+    println("medium")
+} else {
+    println("small")
+}

@@ -8,6 +8,12 @@ namespace StatementAst {
     export class Statement {
     }
 
+    export class Block extends Statement{
+        constructor(public statements: Array<Statement>) {
+            super()
+        }
+    }
+
     export class Return extends Statement {
     }
 

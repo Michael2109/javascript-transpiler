@@ -59,6 +59,18 @@ namespace ExpressionIr {
         }
     }
 
+    export class RBinary extends Expression {
+        constructor(public op: RBinOp, public expression1: Expression, public expression2: Expression) {
+            super()
+        }
+    }
+
+    export class BBinary extends Expression {
+        constructor(public op: BBinOp, public expression1: Expression, public expression2: Expression) {
+            super()
+        }
+    }
+
     export abstract class Operator extends Expression {
     }
 
@@ -80,6 +92,40 @@ namespace ExpressionIr {
 
     export class Divide extends ABinOp {
         value = "Divide"
+    }
+
+    export abstract class RBinOp extends Operator {
+    }
+
+    export class GreaterEqual extends RBinOp {
+        value = "GreaterEqual"
+    }
+
+    export class Greater extends RBinOp {
+        value = "Greater"
+    }
+
+    export class LessEqual extends RBinOp {
+        value = "LessEqual"
+    }
+
+    export class Less extends RBinOp {
+        value = "Less"
+    }
+
+    export class Equal extends RBinOp {
+        value = "Equal"
+    }
+
+    export abstract class BBinOp extends Operator {
+    }
+
+    export class And extends BBinOp {
+        value = "And"
+    }
+
+    export class Or extends BBinOp {
+        value = "Or"
     }
 
     export class IntConst implements Expression {

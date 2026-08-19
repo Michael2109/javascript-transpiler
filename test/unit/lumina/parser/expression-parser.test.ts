@@ -14,6 +14,9 @@ import Subtract = ExpressionAst.Subtract;
 import Multiply = ExpressionAst.Multiply;
 import BBinary = ExpressionAst.BBinary;
 import Greater = ExpressionAst.Greater;
+import Less = ExpressionAst.Less;
+import And = ExpressionAst.And;
+import Or = ExpressionAst.Or;
 import RBinary = ExpressionAst.RBinary;
 import Postfix = ExpressionAst.Postfix;
 import Variable = ExpressionAst.Variable;
@@ -59,6 +62,21 @@ test('Parse boolean expressions', () => {
                 new IntConst(10),
            ),
         6)
+});
+
+test('Parse logical operators', () => {
+    assertSuccess(parse("1 && 2", expressions()),
+        new BBinary(new And(), new IntConst(1), new IntConst(2)),
+        6)
+    assertSuccess(parse("1 || 2", expressions()),
+        new BBinary(new Or(), new IntConst(1), new IntConst(2)),
+        6)
+    assertSuccess(parse("1 > 2 && 3 < 4", expressions()),
+        new BBinary(
+            new And(),
+            new RBinary(new Greater(), new IntConst(1), new IntConst(2)),
+            new RBinary(new Less(), new IntConst(3), new IntConst(4))),
+        14)
 });
 
 test('Parse access modifier', () => {

@@ -6,9 +6,13 @@ import {
     digit,
     either, eitherMany,
     end,
+    label,
     opt,
+    P,
     parse,
+    ParseFailure,
     ParseResult,
+    quiet,
     rep,
     seq,
     spaces,
@@ -17,6 +21,7 @@ import {
 import {assertFailure, assertSuccess} from "./parser-test-utils";
 
 import {Optional} from "../../../../src/lumina/parser/optional";
+import {InputStream} from "../../../../src/lumina/parser/input-stream";
 
 beforeAll(() => {
     global.console = require('console')
@@ -123,6 +128,61 @@ test('Cut', () => {
 test('Optional', () => {
     assertSuccess(parse("input123", opt(capture(str("input")))), new Optional<string>("input"), 5)
     assertSuccess(parse("input123", opt(capture(str("other")))), new Optional<string>(), 0)
+});
+
+/**
+ * Where the stream is left after running a parser. Asserted directly rather than
+ * through parse(), whose reported position is the furthest failure rather than
+ * the stream position.
+ */
+function positionAfter<T>(input: string, parser: P<T>): number {
+    const inputStream = new InputStream(input)
+    parser.createParser(inputStream)
+    return inputStream.position
+}
+
+test('Failed parsers do not consume input', () => {
+
+    // str must rewind after a partial match, not leave the stream mid-token
+    expect(positionAfter("input123", str("inputX"))).toBe(0)
+
+    // a failed optional must leave the stream exactly where it started
+    expect(positionAfter("input123", opt(capture(str("inputX"))))).toBe(0)
+
+    // rep must not leave the stream inside the element that failed
+    expect(positionAfter("ababaX", rep(capture(str("ab"))))).toBe(4)
+
+    // a separator consumed by rep must be given back when no element follows it
+    expect(positionAfter("ab,ab,", rep(capture(str("ab")), {sep: str(",")}))).toBe(5)
+
+    // successful parsers still advance
+    expect(positionAfter("input123", str("input"))).toBe(5)
+});
+
+test('Failures report the furthest position reached', () => {
+
+    // The first alternative fails immediately, the second gets three characters
+    // in. After backtracking the stream is back at 0, but 3 is where the input
+    // actually went wrong.
+    const parseResult = parse("abcX", eitherMany(seq(str("z"), str("z")), seq(str("abc"), str("Y"))))
+
+    assertFailure(parseResult, 3)
+    expect((parseResult as ParseFailure<any>).expected).toContain('"Y"')
+});
+
+test('label replaces the expected set of its parser', () => {
+
+    const parseResult = parse("!", label("identifier", capture(charIn("a-z"))))
+
+    assertFailure(parseResult, 0)
+    expect((parseResult as ParseFailure<string>).expected).toStrictEqual(["identifier"])
+});
+
+test('quiet keeps a parser out of the expected set', () => {
+
+    const parseResult = parse("!", seq(opt(quiet(str("a"))), str("b")))
+
+    expect((parseResult as ParseFailure<any>).expected).toStrictEqual(['"b"'])
 });
 
 test('Map', () => {

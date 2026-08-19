@@ -1,7 +1,7 @@
-import {capture, cut, either, eitherMany, end, lazy, opt, P, rep, seq, spaces, str} from "../../parser/parser";
+import {capture, cut, either, eitherMany, end, lazy, opt, P, rep, seq, str} from "../../parser/parser";
 import {ExpressionAst} from "../ast/expression-ast"
 import {expressionParser, expressions} from "./expression-parser";
-import {identifier, keyword} from "./lexical-parser";
+import {identifier, keyword, spaces, statementSeparator, optionalStatementSeparator} from "./lexical-parser";
 
 import {DeclarationAst} from "../ast/declaration-ast";
 import {StatementAst} from "../ast/statement-ast";
@@ -22,11 +22,10 @@ import Assign = DeclarationAst.Assign;
 import Reassign = DeclarationAst.Reassign;
 import Import = DeclarationAst.Import;
 import LocalType = ExpressionAst.LocalType;
-import Namespace = DeclarationAst.Namespace;
-import {namespace} from "./declaration-parser";
+import Block = StatementAst.Block;
 
 function compilationUnit(): P<CompilationUnit> {
-    return seq(rep(statement()), end()).map(results => new CompilationUnit(
+    return seq(spaces(), rep(statement(), {sep: statementSeparator()}), optionalStatementSeparator(), spaces(), end()).map(results => new CompilationUnit(
         {nameSpace: []},
         [],
         results
@@ -46,14 +45,13 @@ function importParser(): P<Import> {
 
 function statement(): P<Statement> {
     return lazy(() =>
-        eitherMany<Statement>(namespace(), classParser(), method(), assign(), reassign(), expressionAsStatement())
+        eitherMany<Statement>(classParser(), ifStatement(), method(), assign(), reassign(), expressionAsStatement())
     )
 }
 
 function classParser(): P<ClassModel> {
 
     return seq(
-        spaces(),
         keyword("class"),
         spaces(),
         identifier(),
@@ -156,7 +154,7 @@ function typeRef(): P<Ref> {
 
 function ifStatement(): P<If> {
     function ifParser(): P<[Expression, Statement]> {
-        return seq(keyword("if"), spaces(), str("("), spaces(), expressionParser(), spaces(), str(")"), block()).map(result => result)
+        return seq(keyword("if"), spaces(), str("("), spaces(), expressions(), spaces(), str(")"), block()).map(results => [results[0], new Block(results[1])])
     }
 
     function elseParser(): P<Statement> {
@@ -167,11 +165,11 @@ function ifStatement(): P<If> {
     }
 
     function elifP(): P<[Expression, Statement]> {
-        return seq(spaces(), keyword("else"), spaces(), keyword("if"), spaces(), cut(str("(")), spaces(), expressionParser(), spaces(), str(")"), block())
+        return seq(spaces(), keyword("else"), spaces(), keyword("if"), spaces(), cut(str("(")), spaces(), expressions(), spaces(), str(")"), block()).map(results => [results[0], new Block(results[1])])
     }
 
     function elseP(): P<Statement> {
-        return seq(spaces(), keyword("else"), block())
+        return seq(spaces(), keyword("else"), block()).map(results => new Block(results))
     }
 
     return seq(ifParser(), opt(elseParser())).map(result => {
@@ -179,9 +177,12 @@ function ifStatement(): P<If> {
     })
 }
 
+/**
+ * Leading whitespace is consumed so callers can write `) block()`, but trailing
+ * whitespace is not — that would swallow the separator after a block statement.
+ */
 function block(): P<Array<Statement>> {
-    // TODO Should repeat by either a semi-colon or a newline
-    return seq(spaces(), str("{"), spaces(), rep(statement(), {sep: spaces()}), spaces(), str("}"), spaces())
+    return seq(spaces(), str("{"), spaces(), rep(statement(), {sep: statementSeparator()}), optionalStatementSeparator(), spaces(), str("}"))
         .map(result => result)
 }
 
@@ -200,6 +201,7 @@ function assign(): P<Assign> {
             spaces()
         )),
         str("="),
+        spaces(),
         statement()
     ).map(results => new Assign(
             results[1],
@@ -212,7 +214,6 @@ function assign(): P<Assign> {
 
 function reassign(): P<Reassign> {
     return seq(
-        spaces(),
         identifier(),
         spaces(),
         str("<-"),
@@ -226,7 +227,7 @@ function reassign(): P<Reassign> {
 }
 
 function expressionAsStatement(): P<ExprAsStmt> {
-    return seq(spaces(), expressions(), spaces()).map(result => new ExprAsStmt(result))
+    return expressions().map(result => new ExprAsStmt(result))
 }
 
 export {expressionAsStatement,compilationUnit, block, ifStatement, method, field, typeRef, classParser, assign, reassign, statement}

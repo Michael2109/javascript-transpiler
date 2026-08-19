@@ -7,7 +7,7 @@ import {DeclarationAst} from "./lumina/compiler/ast/declaration-ast";
 import js_beautify from "js-beautify";
 import fs from 'fs';
 import path from 'path';
-import {parse, ParseFailure, ParseSuccess} from "./lumina/parser/parser";
+import {describeFailure, parse, ParseFailure, ParseSuccess} from "./lumina/parser/parser";
 import CompilationUnit = DeclarationAst.CompilationUnit;
 
 function getFiles(basePath: string): string[] {
@@ -82,7 +82,7 @@ const luminaFiles = getFiles("./" + source).filter(isLuminaFile)
 console.log("Lumina Files")
 console.log(luminaFiles)
 
-luminaFiles.forEach((file: any) => {
+for (const file of luminaFiles) {
 
     const fileContent = fs.readFileSync("./" + source + "/" + file, 'utf8')
     const parseResult = parse(fileContent, compilationUnit());
@@ -96,22 +96,21 @@ luminaFiles.forEach((file: any) => {
 
         const newFileName = file.substr(0, file.lastIndexOf(".")) + ".js"
 
-
-
         console.log("New file name: " + newFileName)
-      // Resolve the relative path to an absolute path
-        const outputPath = path.isAbsolute(target) ? (target+ "\\" + newFileName) : (process.cwd() + "\\" + target + "\\" + newFileName)
+        // Resolves against the working directory when target is relative.
+        const outputPath = path.resolve(target, newFileName)
 
-
-      console.log(outputPath)
+        console.log(outputPath)
         ensureDirectoryExistence(outputPath)
         fs.writeFileSync(outputPath, code, 'utf8');
 
     } else {
 
         const parseFailure = parseResult as ParseFailure<CompilationUnit>
-        throw new Error("Syntax error: `" + parseFailure.position + "` : `" + fileContent.slice(parseFailure.position)) + "`"
+        const remainder = fileContent.slice(parseFailure.position, parseFailure.position + 40)
+
+        throw new Error(`${file}: ${describeFailure(parseFailure)}\n  near: ${remainder}`)
     }
-})
+}
 
 

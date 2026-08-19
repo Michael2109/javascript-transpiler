@@ -1,6 +1,7 @@
 import {ControlFlowAst} from "../ast/control-flow-ast";
 import For = ControlFlowAst.For;
-import {cut, P, seq, spaces, str} from "../../parser/parser";
+import {cut, P, seq, str} from "../../parser/parser";
+import {spaces} from "./lexical-parser";
 import {identifier, keyword, variable} from "./lexical-parser";
 import {assign, block} from "./statement-parser";
 import {booleanExpression, expressions} from "./expression-parser";

@@ -1,42 +1,37 @@
-namespace DeclarationAst {
+class Declaration extends Statement
 
-    class Declaration extends Statement
+class CompilationUnit(ns: NameSpace, imports: Array[Import], statements: Array[Statement])
 
-    class CompilationUnit(ns: NameSpace, imports: Array[Import], statements: Array[Statement])
+class Import(loc: Array[string])
 
-    class Import(loc: Array[string])
+class Model extends Declaration
 
-    class Namespace(name: string, statements: Array[Statement])
+class ClassModel(
+    name: string,
+    modifiers: Array[Modifier],
+    fields: Array[Field],
+    parent?: Type,
+    parentArguments: Array[Expression],
+    interfaces: Array[Type],
+    statements: Array[Statement]
+) extends Model
 
-    class Model extends Declaration
+class Method (
+    name: string,
+    annotations: Array[Annotation],
+    fields: Array[Field],
+    modifiers: Array[Modifier],
+    returnType?: Type,
+    statements: Array[Statement]
+) extends Declaration
 
-    class ClassModel(
-        name: string,
-        modifiers: Array[Modifier],
-        fields: Array[Field],
-        parent?: Type,
-        parentArguments: Array[Expression],
-        interfaces: Array[Type],
-        statements: Array[Statement]
-    ) extends Model
+class Field(name: string, required: boolean, ref: Type, init?: Expression)
 
-    class Method (
-        name: string,
-        annotations: Array[Annotation],
-        fields: Array[Field],
-        modifiers: Array[Modifier],
-        returnType?: Type,
-        statements: Array[Statement]
-    ) extends Declaration
+class Assign(
+    name: string,
+    type?: Type,
+    immutable: boolean,
+    statement: Statement
+) extends Declaration
 
-    class Field(name: string, required: boolean, ref: Type, init?: Expression)
-
-    class Assign(
-        name: string,
-        type?: Type,
-        immutable: boolean,
-        statement: Statement
-    ) extends Declaration
-
-    class Reassign (name: string, statement: Statement) extends Statement
-}
+class Reassign (name: string, statement: Statement) extends Statement

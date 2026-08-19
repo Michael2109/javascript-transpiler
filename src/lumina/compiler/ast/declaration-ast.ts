@@ -26,11 +26,6 @@ namespace DeclarationAst {
         }
     }
 
-    export class Namespace {
-        constructor(public name: string, public statements: Array<Statement>) {
-        }
-    }
-
     export class Model extends Declaration {
     }
 

@@ -1,0 +1,15 @@
+// a line comment at the top
+let x = 5 // trailing line comment
+
+/* a block comment
+   spanning several lines */
+let y = 10
+
+/* inline */ println(x + y)
+
+let describe() {
+    // comment inside a block
+    println("done") /* and after a statement */
+}
+
+describe()

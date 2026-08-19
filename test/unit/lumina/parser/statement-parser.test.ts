@@ -10,7 +10,7 @@ import {
     field,
     ifStatement,
     method,
-    reassign
+    reassign, statement
 } from "../../../../src/lumina/compiler/parser/statement-parser";
 import {ControlFlowAst} from "../../../../src/lumina/compiler/ast/control-flow-ast";
 import {DeclarationAst} from "../../../../src/lumina/compiler/ast/declaration-ast";
@@ -19,7 +19,10 @@ import {parse} from "../../../../src/lumina/parser/parser";
 import ExprAsStmt = StatementAst.ExprAsStmt;
 import Variable = ExpressionAst.Variable;
 import If = ControlFlowAst.If;
+import Block = StatementAst.Block;
 import IntConst = ExpressionAst.IntConst;
+import RBinary = ExpressionAst.RBinary;
+import Greater = ExpressionAst.Greater;
 import Method = DeclarationAst.Method;
 import Field = DeclarationAst.Field;
 import RefLocal = ExpressionAst.LocalType;
@@ -27,8 +30,6 @@ import ClassModel = DeclarationAst.ClassModel;
 import Assign = DeclarationAst.Assign;
 import Reassign = DeclarationAst.Reassign;
 import LocalType = ExpressionAst.LocalType;
-import {namespace} from "../../../../src/lumina/compiler/parser/declaration-parser";
-import Namespace = DeclarationAst.Namespace;
 
 beforeAll(() => {
     global.console = require('console')
@@ -45,10 +46,29 @@ test('Parse block', () => {
 });
 
 test('Parse if statement', () => {
-    assertSuccess(parse("if(1){ }", ifStatement()), new If(new IntConst(1), [], undefined), 8)
-    assertSuccess(parse("if(1){ } else {}", ifStatement()), new If(new IntConst(1), [], []), 16)
-    assertSuccess(parse("if(1){ } else if(2) {} else {}", ifStatement()), new If(new IntConst(1), [], new If(new IntConst(2), [], [])), 30)
+    assertSuccess(parse("if(x){ }", statement()), new If(new Variable("x"), new Block([]), undefined), 8)
+    assertSuccess(parse("if(1){ } else {}", statement()), new If(new IntConst(1), new Block([]), new Block([])), 16)
+    assertSuccess(parse("if(1){ } else if(2) {} else {}", statement()), new If(new IntConst(1), new Block([]), new If(new IntConst(2), new Block([]), new Block([]))), 30)
+    assertSuccess(parse("if(x > 1){ }", statement()), new If(new RBinary(new Greater(), new Variable("x"), new IntConst(1)), new Block([]), undefined), 12)
 
+});
+
+test('Statements are separated by a newline or a semicolon', () => {
+
+    const twoStatements = [new ExprAsStmt(new Variable("a")), new ExprAsStmt(new Variable("b"))]
+
+    assertSuccess(parse("{ a\nb }", block()), twoStatements, 7)
+    assertSuccess(parse("{ a; b }", block()), twoStatements, 8)
+    assertSuccess(parse("{ a;\nb }", block()), twoStatements, 8)
+
+    // blank lines and comments around the separator are fine
+    assertSuccess(parse("{ a // note\n\n b }", block()), twoStatements, 17)
+
+    // a trailing separator before the closing brace is allowed
+    assertSuccess(parse("{ a; }", block()), [new ExprAsStmt(new Variable("a"))], 6)
+
+    // but two statements with nothing between them are not
+    assertFailure(parse("{ a b }", block()), 4)
 });
 
 test('Parse assignment', () => {
@@ -75,12 +95,6 @@ test('Parse field', () => {
         new Field("x", false, new RefLocal("ClassName")),
         17)
 });
-
-test('Parse namespace', () => {
-    assertSuccess(parse("namespace X { }", namespace()), new Namespace("X", []), 15)
-    assertFailure(parse("namespace X { #unknown-syntax }", namespace()),  14)
-});
-
 
 test('Parse class', () => {
 
